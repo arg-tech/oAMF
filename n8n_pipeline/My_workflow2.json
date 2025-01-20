@@ -1,0 +1,280 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "functionCode": "return items;"
+      },
+      "name": "Text to JSON6",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        720,
+        460
+      ],
+      "id": "3f3156a0-aad2-47e2-9a0b-1fd98591e5bb"
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://default-turninator.amfws.arg.tech/turninator-01",
+        "responseFormat": "file",
+        "jsonParameters": true,
+        "options": {
+          "bodyContentType": "multipart-form-data"
+        },
+        "sendBinaryData": true
+      },
+      "name": "Turninator7",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        460
+      ],
+      "id": "9f89f90b-413a-4ac0-ba9e-e03eaf3f08fd"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": "=true",
+        "values": {
+          "string": [
+            {
+              "name": "text",
+              "value": " Bob: We should go eat. Wilma: Why?  Bob: Because I'm hungry Wilma: Yeah me too. Bob: So let's eat."
+            },
+            {
+              "name": "AIF",
+              "value": "{}"
+            }
+          ],
+          "boolean": [
+            {
+              "name": "dialog",
+              "value": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set Dialog Text1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        500,
+        460
+      ],
+      "id": "d2d55f5e-9bfa-4f11-8a3c-84ca7c913624"
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://default-proposition-unitiser.amfws.arg.tech/propositionUnitizer-01",
+        "responseFormat": "file",
+        "jsonParameters": true,
+        "options": {
+          "bodyContentType": "multipart-form-data"
+        },
+        "sendBinaryData": true
+      },
+      "name": "Propositionalizer4",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        460
+      ],
+      "id": "319cdc09-e741-4299-bef9-03d2e6c21498"
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://default-segmenter.amfws.arg.tech/segmenter-01",
+        "responseFormat": "file",
+        "jsonParameters": true,
+        "options": {
+          "bodyContentType": "multipart-form-data"
+        },
+        "sendBinaryData": true
+      },
+      "name": "Segmenter7",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        460
+      ],
+      "id": "b533f4ea-9ea7-430a-8bc3-2841f109d4d4"
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://bert-te.amfws.arg.tech/bert-te",
+        "responseFormat": "file",
+        "jsonParameters": true,
+        "options": {
+          "bodyContentType": "multipart-form-data"
+        },
+        "sendBinaryData": true
+      },
+      "name": "bert-te5",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        1820,
+        460
+      ],
+      "id": "a2d30fe6-657c-465c-8de4-892633b0729e"
+    },
+    {
+      "parameters": {
+        "mode": "jsonToBinary",
+        "options": {
+          "fileName": "file.json",
+          "mimeType": "text/plain"
+        }
+      },
+      "name": "JSON to File8",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        920,
+        460
+      ],
+      "id": "14d9ab5d-dc34-4aa8-889d-ce255f0ac578"
+    },
+    {
+      "parameters": {
+        "respondWith": "binary",
+        "options": {}
+      },
+      "id": "cf79248a-bb45-4e12-aa24-ace90632b1a6",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2020,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "47c193b6-988b-45af-b777-bff42ca01f3b",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "fe2a0e70-4ed1-4bfd-94ec-c75891066a26",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        280,
+        460
+      ],
+      "webhookId": "47c193b6-988b-45af-b777-bff42ca01f3b"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Text to JSON6": {
+      "main": [
+        [
+          {
+            "node": "JSON to File8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Turninator7": {
+      "main": [
+        [
+          {
+            "node": "Segmenter7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Dialog Text1": {
+      "main": [
+        [
+          {
+            "node": "Text to JSON6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Propositionalizer4": {
+      "main": [
+        [
+          {
+            "node": "bert-te5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Segmenter7": {
+      "main": [
+        [
+          {
+            "node": "Propositionalizer4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JSON to File8": {
+      "main": [
+        [
+          {
+            "node": "Turninator7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "bert-te5": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Dialog Text1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "68a90af4-ef3c-4eb6-a6b0-043e3d47f38b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cef26e2d9fe6b9a52f544d92ea5f3e5bce357b165d40035d1591d669b530187a"
+  },
+  "id": "AANY21jjo1tTf0U7",
+  "tags": []
+}

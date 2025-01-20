@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@n8n_io/n8n-demo-component/n8n-demo.bundled.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs@2.0.0/webcomponents-loader.js"></script>
+  <script src="https://www.unpkg.com/lit@2.0.0-rc.2/polyfill-support.js"></script>
+  <title>Workflow Selection</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f1f1f1;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      font-size: 2.5em;
+      margin-top: 50px;
+    }
+    .workflow-selection {
+      text-align: center;
+      margin: 30px 0;
+    }
+    .workflow-selection label {
+      margin: 0 15px;
+      font-size: 1.2em;
+      color: #555;
+    }
+    .workflow-selection input {
+      margin-right: 10px;
+      accent-color: #0066cc;
+    }
+    .workflow-container {
+      display: none;
+      margin-top: 30px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    .workflow-container h2 {
+      text-align: center;
+      color: #444;
+      font-size: 1.8em;
+      margin-bottom: 20px;
+    }
+    #inputBoxContainer {
+      text-align: center;
+      margin-top: 30px;
+    }
+    #userInput {
+      padding: 10px;
+      font-size: 1.2em;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      width: 50%;
+      max-width: 400px;
+      outline: none;
+      transition: border 0.3s ease;
+    }
+    #userInput:focus {
+      border-color: #0066cc;
+    }
+    button {
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 30px;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #005bb5;
+    }
+    #webhookResponse {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    #webhookResponse h3 {
+      margin-bottom: 10px;
+      color: #333;
+      font-size: 1.5em;
+    }
+    #responseData {
+      font-family: 'Courier New', monospace;
+      background-color: #e0e0e0;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+    n8n-demo {
+      --n8n-frame-background-color: #fafafa;
+      --n8n-json-background-color: #f0f0f0;
+      --n8n-copy-button-background-color: #ccc;
+      --n8n-workflow-min-height: 100px;
+      --n8n-iframe-border-radius: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Select and Execute Workflow</h1>
+
+  <div class="workflow-selection">
+    <label>
+      <input type="checkbox" id="workflow1Checkbox"> Workflow 1
+    </label>
+    <label>
+      <input type="checkbox" id="workflow2Checkbox"> Workflow 2
+    </label>
+  </div>
+
+  <div id="workflow1" class="workflow-container">
+    <h2>Workflow 1</h2>
+    <n8n-demo id="workflow1Visualization" workflow='{
+      "name": "My workflow",
+      "nodes": [
+        {
+          "parameters": {
+            "functionCode": "return items;"
+          },
+          "name": "Text to JSON6",
+          "type": "n8n-nodes-base.function",
+          "typeVersion": 1,
+          "position": [
+            900,
+            460
+          ],
+          "id": "ab512690-f0aa-462a-bebb-c3e30d4678a4"
+        },
+        {
+          "parameters": {
+            "requestMethod": "POST",
+            "url": "http://default-turninator.amfws.arg.tech/turninator-01",
+            "responseFormat": "file",
+            "jsonParameters": true,
+            "options": {
+              "bodyContentType": "multipart-form-data"
+            },
+            "sendBinaryData": true
+          },
+          "name": "Turninator7",
+          "type": "n8n-nodes-base.httpRequest",
+          "typeVersion": 1,
+          "position": [
+            1320,
+            460
+          ],
+          "id": "39a4a837-6a70-461f-9b41-0470a74e7ebe"
+        },
+        {
+          "parameters": {
+            "keepOnlySet": "=true",
+            "values": {
+              "string": [
+                {
+                  "name": "text",
+                  "value": "={{$json[\"body\"][\"text\"]}}"
+                },
+                {
+                  "name": "AIF",
+                  "value": "{}"
+                }
+              ],
+              "boolean": [
+                {
+                  "name": "dialog",
+                  "value": true
+                }
+              ]
+            },
+            "options": {}
+          },
+          "name": "Set Dialog Text1",
+          "type": "n8n-nodes-base.set",
+          "typeVersion": 1,
+          "position": [
+            680,
+            460
+          ],
+          "id": "b0c724ee-6dc1-402c-bd4d-f874e5cebd82"
+        },
+        {
+          "parameters": {
+            "requestMethod": "POST",
+            "url": "http://default-proposition-unitiser.amfws.arg.tech/propositionUnitizer-01",
+            "responseFormat": "file",
+            "jsonParameters": true,
+            "options": {
+              "bodyContentType": "multipart-form-data"
+            },
+            "sendBinaryData": true
+          },
+          "name": "Propositionalizer4",
+          "type": "n8n-nodes-base.httpRequest",
+          "typeVersion": 1,
+          "position": [
+            1760,
+            460
+          ],
+          "id": "13972aa8-d3a2-46f4-b442-3d59dc052985"
+        },
+        {
+          "parameters": {
+            "requestMethod": "POST",
+            "url": "http://default-segmenter.amfws.arg.tech/segmenter-01",
+            "responseFormat": "file",
+            "jsonParameters": true,
+            "options": {
+              "bodyContentType": "multipart-form-data"
+            },
+            "sendBinaryData": true
+          },
+          "name": "Segmenter7",
+          "type": "n8n-nodes-base.httpRequest",
+          "typeVersion": 1,
+          "position": [
+            1540,
+            460
+          ],
+          "id": "11e77002-e40c-47d8-918e-c326bfe61478"
+        },
+        {
+          "parameters": {
+            "requestMethod": "POST",
+            "url": "http://bert-te.amfws.arg.tech/bert-te",
+            "responseFormat": "file",
+            "jsonParameters": true,
+            "options": {
+              "bodyContentType": "multipart-form-data"
+            },
+            "sendBinaryData": true
+          },
+          "name": "bert-te5",
+          "type": "n8n-nodes-base.httpRequest",
+          "typeVersion": 1,
+          "position": [
+            2000,
+            460
+          ],
+          "id": "291b2b5d-2b90-4adf-852e-cca900cf62d4"
+        },
+        {
+          "parameters": {
+            "mode": "jsonToBinary",
+            "options": {
+              "fileName": "file.json",
+              "mimeType": "text/plain"
+            }
+          },
+          "name": "JSON to File8",
+          "type": "n8n-nodes-base.moveBinaryData",
+          "typeVersion": 1,
+          "position": [
+            1100,
+            460
+          ],
+          "id": "c80795e5-5a25-4de0-b2e6-5fb0420c2c46"
+        },
+        {
+          "parameters": {
+            "respondWith": "binary",
+            "options": {}
+          },
+          "id": "b7353c25-46f3-4a6d-8b4c-6df9b07cccf2",
+          "name": "Respond to Webhook",
+          "type": "n8n-nodes-base.respondToWebhook",
+          "typeVersion": 1.1,
+          "position": [
+            2200,
+            460
+          ]
+        },
+        {
+          "parameters": {
+            "httpMethod": "POST",
+            "path": "47c193b6-988b-45af-b777-bff42ca01f3b",
+            "responseMode": "responseNode",
+            "options": {}
+          },
+          "id": "57a78005-5a06-455b-85d3-d397f020785f",
+          "name": "Webhook",
+          "type": "n8n-nodes-base.webhook",
+          "typeVersion": 1,
+          "position": [
+            460,
+            460
+          ],
+          "webhookId": "47c193b6-988b-45af-b777-bff42ca01f3b"
+        }
+      ],
+      "pinData": {},
+      "connections": {
+        "Text to JSON6": {
+          "main": [
+            [
+              {
+                "node": "JSON to File8",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Turninator7": {
+          "main": [
+            [
+              {
+                "node": "Segmenter7",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Set Dialog Text1": {
+          "main": [
+            [
+              {
+                "node": "Text to JSON6",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Propositionalizer4": {
+          "main": [
+            [
+              {
+                "node": "bert-te5",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Segmenter7": {
+          "main": [
+            [
+              {
+                "node": "Propositionalizer4",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "JSON to File8": {
+          "main": [
+            [
+              {
+                "node": "Turninator7",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "bert-te5": {
+          "main": [
+            [
+              {
+                "node": "Respond to Webhook",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Webhook": {
+          "main": [
+            [
+              {
+                "node": "Set Dialog Text1",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        }
+      },
+      "active": true,
+      "settings": {
+        "executionOrder": "v1"
+      },
+      "versionId": "5dd1745e-7419-4020-ac2a-0d575ac74ba6",
+      "meta": {
+        "templateCredsSetupCompleted": true,
+        "instanceId": "8d57ee11954c05f010df18b7960f66effd5c56a218a142dfc9bf7da6bd99a7f7"
+      },
+      "id": "bOxzyp5Y8Jkyf9HV",
+      "tags": []
+    }' frame="true"></n8n-demo>
+  </div>
+
+  <div id="workflow2" class="workflow-container">
+    <h2>Workflow 2</h2>
+    <n8n-demo id="workflow2Visualization" workflow='{
+      "name": "My workflow 2",
+      "nodes": [
+        {
+          "parameters": {
+            "functionCode": "return items;"
+          },
+          "name": "Text to JSON6",
+          "type": "n8n-nodes-base.function",
+          "typeVersion": 1,
+          "position": [
+            460,
+            320
+          ],
+          "id": "ab77b383-2a56-49d2-9d05-8c3f093a13ae"
+        },
+        {
+          "parameters": {
+            "requestMethod": "POST",
+            "url": "http://default-turninator.amfws.arg.tech/turninator-01",
+            "responseFormat": "file",
+            "jsonParameters": true,
+            "options": {
+              "bodyContentType": "multipart-form-data"
+            },
+            "sendBinaryData": true
+          },
+          "name": "Turninator7",
+          "type": "n8n-nodes-base.httpRequest",
+          "typeVersion": 1,
+          "position": [
+            860,
+            320
+          ],
+          "id": "8310b651-9e4a-47c0-9fe9-0cd4064f9f66"
+        },
+        {
+          "parameters": {
+            "keepOnlySet": "=true",
+            "values": {
+              "string": [
+                {
+                  "name": "text",
+                  "value": "={{$json[\"body\"][\"text\"]}}"
+                },
+                {
+                  "name": "AIF",
+                  "value": "{}"
+                }
+              ],
+              "boolean": [
+                {
+                  "name": "dialog",
+                  "value": true
+                }
+              ]
+            },
+            "options": {}
+          },
+          "name": "Set Dialog Text1",
+          "type": "n8n-nodes-base.set",
+          "typeVersion": 1,
+          "position": [
+            240,
+            300
+          ],
+          "id": "ee6859dc-73b3-4730-99a7-58a0da23e9bc"
+        },
+        {
+          "parameters": {
+            "requestMethod": "POST",
+            "url": "http://default-proposition-unitiser.amfws.arg.tech/propositionUnitizer-01",
+            "responseFormat": "file",
+            "jsonParameters": true,
+            "options": {
+              "bodyContentType": "multipart-form-data"
+            },
+            "sendBinaryData": true
+          },
+          "name": "Propositionalizer4",
+          "type": "n8n-nodes-base.httpRequest",
+          "typeVersion": 1,
+          "position": [
+            1220,
+            320
+          ],
+          "id": "cbc69ad7-80d5-45c8-920f-cd688740c1f5"
+        },
+        {
+          "parameters": {
+            "requestMethod": "POST",
+            "url": "http://default-segmenter.amfws.arg.tech/segmenter-01",
+            "responseFormat": "file",
+            "jsonParameters": true,
+            "options": {
+              "bodyContentType": "multipart-form-data"
+            },
+            "sendBinaryData": true
+          },
+          "name": "Segmenter7",
+          "type": "n8n-nodes-base.httpRequest",
+          "typeVersion": 1,
+          "position": [
+            1040,
+            320
+          ],
+          "id": "c524d252-c5ef-4664-82b5-9642b478aa46"
+        },
+        {
+          "parameters": {
+            "requestMethod": "POST",
+            "url": "http://bert-te.amfws.arg.tech/bert-te",
+            "responseFormat": "file",
+            "jsonParameters": true,
+            "options": {
+              "bodyContentType": "multipart-form-data"
+            },
+            "sendBinaryData": true
+          },
+          "name": "bert-te5",
+          "type": "n8n-nodes-base.httpRequest",
+          "typeVersion": 1,
+          "position": [
+            1420,
+            320
+          ],
+          "id": "d341b839-d1eb-4ae9-b049-b11326fcf5da"
+        },
+        {
+          "parameters": {
+            "mode": "jsonToBinary",
+            "options": {
+              "fileName": "file.json",
+              "mimeType": "text/plain"
+            }
+          },
+          "name": "JSON to File8",
+          "type": "n8n-nodes-base.moveBinaryData",
+          "typeVersion": 1,
+          "position": [
+            660,
+            320
+          ],
+          "id": "ad3e5b75-446e-493d-82f0-571e6273d2a4"
+        },
+        {
+          "parameters": {
+            "respondWith": "binary",
+            "options": {}
+          },
+          "id": "fc313954-81ed-4f84-831b-78812fb196da",
+          "name": "Respond to Webhook",
+          "type": "n8n-nodes-base.respondToWebhook",
+          "typeVersion": 1.1,
+          "position": [
+            1720,
+            620
+          ]
+        },
+        {
+          "parameters": {
+            "requestMethod": "POST",
+            "url": "http://default-proposition-unitiser.amfws.arg.tech/propositionUnitizer-01",
+            "responseFormat": "file",
+            "jsonParameters": true,
+            "options": {
+              "bodyContentType": "multipart-form-data"
+            },
+            "sendBinaryData": true
+          },
+          "name": "Propositionalizer",
+          "type": "n8n-nodes-base.httpRequest",
+          "typeVersion": 1,
+          "position": [
+            1180,
+            620
+          ],
+          "id": "d3c47b60-5368-405b-9ac8-1a2fb3057b19"
+        },
+        {
+          "parameters": {
+            "requestMethod": "POST",
+            "url": "http://default-segmenter.amfws.arg.tech/segmenter-01",
+            "responseFormat": "file",
+            "jsonParameters": true,
+            "options": {
+              "bodyContentType": "multipart-form-data"
+            },
+            "sendBinaryData": true
+          },
+          "name": "Segmenter",
+          "type": "n8n-nodes-base.httpRequest",
+          "typeVersion": 1,
+          "position": [
+            1000,
+            620
+          ],
+          "id": "41a6f8c5-7964-480e-944b-0537bf4cf41e"
+        },
+        {
+          "parameters": {
+            "requestMethod": "POST",
+            "url": "http://bert-te.amfws.arg.tech/bert-te",
+            "responseFormat": "file",
+            "jsonParameters": true,
+            "options": {
+              "bodyContentType": "multipart-form-data"
+            },
+            "sendBinaryData": true
+          },
+          "name": "bert-te",
+          "type": "n8n-nodes-base.httpRequest",
+          "typeVersion": 1,
+          "position": [
+            1420,
+            640
+          ],
+          "id": "141b11e7-9343-478f-82d6-5b8d7b3ef26e"
+        },
+        {
+          "parameters": {
+            "httpMethod": "POST",
+            "path": "47c193b6-988b-45af-b777-bff42ca01f3b2",
+            "responseMode": "responseNode",
+            "options": {}
+          },
+          "id": "28b3242b-7918-400b-b42c-164750ca7c89",
+          "name": "Webhook",
+          "type": "n8n-nodes-base.webhook",
+          "typeVersion": 1,
+          "position": [
+            -40,
+            300
+          ],
+          "webhookId": "47c193b6-988b-45af-b777-bff42ca01f3b"
+        },
+        {
+          "parameters": {},
+          "id": "51c343d4-6f5e-4354-a8be-528c8c041700",
+          "name": "Merge",
+          "type": "n8n-nodes-base.merge",
+          "typeVersion": 2.1,
+          "position": [
+            1580,
+            440
+          ]
+        }
+      ],
+      "pinData": {},
+      "connections": {
+        "Text to JSON6": {
+          "main": [
+            [
+              {
+                "node": "JSON to File8",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Turninator7": {
+          "main": [
+            [
+              {
+                "node": "Segmenter7",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Set Dialog Text1": {
+          "main": [
+            [
+              {
+                "node": "Text to JSON6",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Propositionalizer4": {
+          "main": [
+            [
+              {
+                "node": "bert-te5",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Segmenter7": {
+          "main": [
+            [
+              {
+                "node": "Propositionalizer4",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "JSON to File8": {
+          "main": [
+            [
+              {
+                "node": "Turninator7",
+                "type": "main",
+                "index": 0
+              },
+              {
+                "node": "Segmenter",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Propositionalizer": {
+          "main": [
+            [
+              {
+                "node": "bert-te",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Segmenter": {
+          "main": [
+            [
+              {
+                "node": "Propositionalizer",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "bert-te": {
+          "main": [
+            [
+              {
+                "node": "Merge",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Webhook": {
+          "main": [
+            [
+              {
+                "node": "Set Dialog Text1",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "bert-te5": {
+          "main": [
+            [
+              {
+                "node": "Merge",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Merge": {
+          "main": [
+            [
+              {
+                "node": "Respond to Webhook",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        }
+      },
+      "active": true,
+      "settings": {
+        "executionOrder": "v1"
+      },
+      "versionId": "3a6f67a2-373a-4e0f-bc00-0e4d147009e5",
+      "meta": {
+        "templateCredsSetupCompleted": true,
+        "instanceId": "8d57ee11954c05f010df18b7960f66effd5c56a218a142dfc9bf7da6bd99a7f7"
+      },
+      "id": "GXMmhAlmUuShK1Ui",
+      "tags": []
+    }' frame="true"></n8n-demo>
+  </div>
+
+  <div id="inputBoxContainer">
+    <label for="userInput">Enter Text:</label>
+    <input type="text" id="userInput" value=" Bob: We should go eat. Wilma: Why?  Bob: Because I'm hungry Wilma: Yeah me too. Bob: So let's eat." placeholder=" Bob: We should go eat. Wilma: Why?  Bob: Because I'm hungry Wilma: Yeah me too. Bob: So let's eat." />
+  </div>
+
+  <div style="text-align: center; margin-top: 30px;">
+    <button id="triggerWebhookButton">Trigger Selected Workflow</button>
+  </div>
+
+  <div id="webhookResponse">
+    <h3>Webhook Response</h3>
+    <pre id="responseData"></pre>
+  </div>
+
+  <script>
+    const apiKey1 = 'n8n_api_f37ee7afcc40c05010cb4a3c595864bebf6018d316d5cdcdb06c8169fb59f9ef341d27727b0f9b5d';
+    const apiKey2 = 'n8n_api_f37ee7afcc40c05010cb4a3c595864bebf6018d316d5cdcdb06c8169fb59f9ef341d27727b0f9b5d';
+    const webhookUrl1 = 'http://localhost:5678/webhook/47c193b6-988b-45af-b777-bff42ca01f3b';
+    const webhookUrl2 = 'http://localhost:5678/webhook/47c193b6-988b-45af-b777-bff42ca01f3b2';
+
+    function toggleWorkflows() {
+      const isWorkflow1Selected = document.getElementById('workflow1Checkbox').checked;
+      const isWorkflow2Selected = document.getElementById('workflow2Checkbox').checked;
+
+      document.getElementById('workflow1').style.display = isWorkflow1Selected ? 'block' : 'none';
+      document.getElementById('workflow2').style.display = isWorkflow2Selected ? 'block' : 'none';
+    }
+
+    document.getElementById('triggerWebhookButton').addEventListener('click', () => {
+      const userInput = document.getElementById('userInput').value.trim();
+      if (!userInput) {
+        alert("Please enter text before triggering the workflow.");
+        return;
+      }
+
+      const selectedWorkflow = document.getElementById('workflow1Checkbox').checked ? webhookUrl1 : webhookUrl2;
+      const apiKey = selectedWorkflow === webhookUrl1 ? apiKey1 : apiKey2;
+
+
+      fetch(selectedWorkflow, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-N8N-API-KEY': apiKey,
+        },
+        body: JSON.stringify({ text: userInput }),
+      })
+
+
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          document.getElementById('responseData').textContent = JSON.stringify(data, null, 2);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          const responseDiv = document.getElementById('webhookResponse');
+          responseDiv.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+        });
+    });
+
+    document.getElementById('workflow1Checkbox').addEventListener('change', toggleWorkflows);
+    document.getElementById('workflow2Checkbox').addEventListener('change', toggleWorkflows);
+    toggleWorkflows();
+  </script>
+
+</body>
+</html>

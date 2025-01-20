@@ -1,0 +1,8 @@
+repositories:
+  - url: https://github.com/arg-tech/default_segmenter.git
+  - url: https://github.com/arg-tech/default_turninator.git
+  - url: https://github.com/arg-tech/bert-te.git
+
+default_ports:
+  start: 5000
+  increment: 10
