@@ -1,18 +1,28 @@
 {
-  "name": "My workflow",
+  "name": "test",
   "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
     {
       "parameters": {
         "functionCode": "return items;"
       },
-      "name": "Text to JSON6",
+      "name": "Text to JSON2",
       "type": "n8n-nodes-base.function",
       "typeVersion": 1,
       "position": [
-        720,
-        460
+        1104,
+        936
       ],
-      "id": "3f3156a0-aad2-47e2-9a0b-1fd98591e5bb"
+      "id": "3bd0af72-afc1-4985-989c-0b5e8301b4f9"
     },
     {
       "parameters": {
@@ -25,14 +35,14 @@
         },
         "sendBinaryData": true
       },
-      "name": "Turninator7",
+      "name": "Turninator2",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 1,
       "position": [
-        1140,
-        460
+        1514,
+        926
       ],
-      "id": "9f89f90b-413a-4ac0-ba9e-e03eaf3f08fd"
+      "id": "79b7316d-de25-4984-9e72-98929a979867"
     },
     {
       "parameters": {
@@ -57,14 +67,14 @@
         },
         "options": {}
       },
-      "name": "Set Dialog Text1",
+      "name": "Set Dialog Text",
       "type": "n8n-nodes-base.set",
       "typeVersion": 1,
       "position": [
-        500,
-        460
+        874,
+        886
       ],
-      "id": "d2d55f5e-9bfa-4f11-8a3c-84ca7c913624"
+      "id": "dd2c0182-8dac-4491-af54-cdf37fae6a55"
     },
     {
       "parameters": {
@@ -77,14 +87,14 @@
         },
         "sendBinaryData": true
       },
-      "name": "Propositionalizer4",
+      "name": "Propositionalizer1",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 1,
       "position": [
-        1580,
-        460
+        1934,
+        926
       ],
-      "id": "319cdc09-e741-4299-bef9-03d2e6c21498"
+      "id": "45ed4f58-78f8-4527-8d94-f2992ae6d5ab"
     },
     {
       "parameters": {
@@ -97,14 +107,14 @@
         },
         "sendBinaryData": true
       },
-      "name": "Segmenter7",
+      "name": "Segmenter2",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 1,
       "position": [
-        1360,
-        460
+        1664,
+        926
       ],
-      "id": "b533f4ea-9ea7-430a-8bc3-2841f109d4d4"
+      "id": "99dd42c4-7f9c-4ef2-8669-23987c3200dc"
     },
     {
       "parameters": {
@@ -117,15 +127,17 @@
         },
         "sendBinaryData": true
       },
-      "name": "bert-te5",
+      "name": "bert-te1",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 1,
       "position": [
-        1820,
-        460
+        2144,
+        936
       ],
-      "id": "a2d30fe6-657c-465c-8de4-892633b0729e"
+      "id": "336f443c-d037-4484-8d7d-7f489c22c907"
     },
+
+
     {
       "parameters": {
         "mode": "jsonToBinary",
@@ -134,131 +146,79 @@
           "mimeType": "text/plain"
         }
       },
-      "name": "JSON to File8",
+      "name": "JSON to File3",
       "type": "n8n-nodes-base.moveBinaryData",
       "typeVersion": 1,
       "position": [
-        920,
-        460
+        1314,
+        916
       ],
-      "id": "14d9ab5d-dc34-4aa8-889d-ce255f0ac578"
-    },
-    {
-      "parameters": {
-        "respondWith": "binary",
-        "options": {}
-      },
-      "id": "cf79248a-bb45-4e12-aa24-ace90632b1a6",
-      "name": "Respond to Webhook",
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.1,
-      "position": [
-        2020,
-        460
-      ]
-    },
-    {
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "47c193b6-988b-45af-b777-bff42ca01f3b",
-        "responseMode": "responseNode",
-        "options": {}
-      },
-      "id": "fe2a0e70-4ed1-4bfd-94ec-c75891066a26",
-      "name": "Webhook",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 1,
-      "position": [
-        280,
-        460
-      ],
-      "webhookId": "47c193b6-988b-45af-b777-bff42ca01f3b"
+      "id": "aeba27ad-e46f-4214-bfa6-cdece4a284f7"
     }
   ],
-  "pinData": {},
   "connections": {
-    "Text to JSON6": {
+    "Text to JSON2": {
       "main": [
         [
           {
-            "node": "JSON to File8",
+            "node": "JSON to File3",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Turninator7": {
+    "Set Dialog Text": {
       "main": [
         [
           {
-            "node": "Segmenter7",
+            "node": "Text to JSON2",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Set Dialog Text1": {
+    "Turninator2": {
       "main": [
         [
           {
-            "node": "Text to JSON6",
+            "node": "Segmenter2",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Propositionalizer4": {
+    "Propositionalizer1": {
       "main": [
         [
           {
-            "node": "bert-te5",
+            "node": "bert-te1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Segmenter7": {
+    "Segmenter2": {
       "main": [
         [
           {
-            "node": "Propositionalizer4",
+            "node": "Propositionalizer1",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "JSON to File8": {
+
+
+    "JSON to File3": {
       "main": [
         [
           {
-            "node": "Turninator7",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "bert-te5": {
-      "main": [
-        [
-          {
-            "node": "Respond to Webhook",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Set Dialog Text1",
+            "node": "Turninator2",
             "type": "main",
             "index": 0
           }
@@ -266,15 +226,7 @@
       ]
     }
   },
-  "active": true,
-  "settings": {
-    "executionOrder": "v1"
-  },
-  "versionId": "68a90af4-ef3c-4eb6-a6b0-043e3d47f38b",
-  "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "cef26e2d9fe6b9a52f544d92ea5f3e5bce357b165d40035d1591d669b530187a"
-  },
-  "id": "AANY21jjo1tTf0U7",
-  "tags": []
+  "active": false,
+  "settings": {},
+  "id": "10"
 }
