@@ -30,7 +30,6 @@ oAMF is a **modular, open-source framework** designed for **end-to-end argument 
 3. [📝 xAIF (Extended Argument Interchange Format)](#xaif-extended-argument-interchange-format)
 4. [📚 Available Modules](#available-modules)
 5. [📦 Module Development](#module-development)
-6. [📌 Release Information](#release-information)
 7. [📜 License](#license)
 8. [📚 Resources](#resources)
 
@@ -104,7 +103,7 @@ oamf.pipelineExecutor(pipeline_graph, input_file, workflow_file)
 
 The web interface allows users to upload **text/xAIF files**, select pipelines, and execute AM tasks without writing any code. Access the web interface here: [oAMF Web Interface](https://arg-tech.github.io/oAMF/).
 
-![Web Page](assets/home.jpeg)
+![Web Page](assets/site-design.png)
 
 ---
 
@@ -113,14 +112,137 @@ The web interface allows users to upload **text/xAIF files**, select pipelines, 
 oAMF uses **xAIF** as a standard format for representing argument structures. Below is an example of xAIF in JSON format:
 
 ```json
-{
-  "nodes": [
-    { "id": "n1", "text": "Climate change is real.", "type": "claim" },
-    { "id": "n2", "text": "Scientists have provided evidence.", "type": "premise" }
-  ],
-  "edges": [
-    { "from": "n2", "to": "n1", "relation": "supports" }
-  ]
+# Sample xAIF JSON 
+aif= {
+  "AIF": {
+    "descriptorfulfillments": null,
+    "edges": [
+      {
+        "edgeID": 0,
+        "fromID": 0,
+        "toID": 4
+      },
+      {
+        "edgeID": 1,
+        "fromID": 4,
+        "toID": 3
+      },
+      {
+        "edgeID": 2,
+        "fromID": 1,
+        "toID": 6
+      },
+      {
+        "edgeID": 3,
+        "fromID": 6,
+        "toID": 5
+      },
+      {
+        "edgeID": 4,
+        "fromID": 2,
+        "toID": 8
+      },
+      {
+        "edgeID": 5,
+        "fromID": 8,
+        "toID": 7
+      },
+      {
+        "edgeID": 6,
+        "fromID": 3,
+        "toID": 9
+      },
+      {
+        "edgeID": 7,
+        "fromID": 9,
+        "toID": 7
+      }
+    ],
+    "locutions": [
+      {
+        "nodeID": 0,
+        "personID": 0
+      },
+      {
+        "nodeID": 1,
+        "personID": 1
+      },
+      {
+        "nodeID": 2,
+        "personID": 2
+      }
+    ],
+    "nodes": [
+      {
+        "nodeID": 0,
+        "text": "disagreements between party members are entirely to be expected.",
+        "type": "L"
+      },
+      {
+        "nodeID": 1,
+        "text": "the SNP has disagreements.",
+        "type": "L"
+      },
+      {
+        "nodeID": 2,
+        "text": "it's not uncommon for there to be disagreements between party members.",
+        "type": "L"
+      },
+      {
+        "nodeID": 3,
+        "text": "disagreements between party members are entirely to be expected.",
+        "type": "I"
+      },
+      {
+        "nodeID": 4,
+        "text": "Default Illocuting",
+        "type": "YA"
+      },
+      {
+        "nodeID": 5,
+        "text": "the SNP has disagreements.",
+        "type": "I"
+      },
+      {
+        "nodeID": 6,
+        "text": "Default Illocuting",
+        "type": "YA"
+      },
+      {
+        "nodeID": 7,
+        "text": "it's not uncommon for there to be disagreements between party members.",
+        "type": "I"
+      },
+      {
+        "nodeID": 8,
+        "text": "Default Illocuting",
+        "type": "YA"
+      },
+      {
+        "nodeID": 9,
+        "text": "Default Inference",
+        "type": "RA"
+      }
+    ],
+    "participants": [
+      {
+        "firstname": "Speaker",
+        "participantID": 0,
+        "surname": "1"
+      },
+      {
+        "firstname": "Speaker",
+        "participantID": 1,
+        "surname": "2"
+      }
+    ],
+    "schemefulfillments": null
+  },
+  "dialog": true,
+  "ova": [],
+  "text": {
+    "txt": " Speaker 1 <span class=\"highlighted\" id=\"0\">disagreements between party members are entirely to be expected.</span>.<br><br> Speaker 2 <span class=\"highlighted\" id=\"1\">the SNP has disagreements.</span>.<br><br> Speaker 1 <span class=\"highlighted\" id=\"2\">it's not uncommon for there to be disagreements between party members. </span>.<br><br>"
+  }
 }
 ```
 
@@ -169,14 +291,26 @@ print(aif.get_csv("argument-relation"))  # Export to CSV format
 
 oAMF includes a variety of argument mining modules, each designed for different tasks:
 
-| Module          | Task                                   | URL                                                   |
-|-----------------|----------------------------------------|-------------------------------------------------------|
-| **Turninator**  | Segmentation                           | [Repo](https://github.com/arg-tech/default_turninator) |
-| **BERT-TE**     | Argument Component Classification      | [Service](http://bert-te.amfws.arg.tech/bert-te)      |
-| **ToulminMapper**| Identifies Toulmin Model Components    | [Repo](https://github.com/arg-tech/ToulminMapper)     |
-| **ArgumenText** | Argument Quality Assessment            | [Repo](https://github.com/arg-tech/ArgumentQuality)   |
+| **Module**       | **Task**                                      | **Input**                                            | **Output**                                                   | **URL**                                                    |
+|------------------|-----------------------------------------------|------------------------------------------------------|--------------------------------------------------------------|------------------------------------------------------------|
+| **DTSG**         | Text Segmentation                              | Unsegmented text and no structure.                   | Text segmented into turns (e.g., contiguous text from one speaker or NOOP in case of monologue). | [Link](http://default-turninator.amfws.arg.tech/turninator-01) |
+| **DSG**          | Text Segmentation & Structuring               | Unsegmented text or text segmented into turns.       | Text segmented using the <SPAN> tag into segments; structure containing L-nodes with IDs cross-referencing those in SPAN tags. | [Link](default-segmenter.amfws.arg.tech/segmenter-01) |
+| **DARJ**         | Co-reference Resolution                       | Segmented locutions.                                 | Resolve co-references (mostly speaker names) in locution nodes. | [Link](cascading-propositionUnitiser.amfws.arg.tech/anaphora-01) |
+| **SPG**          | Segmentation and Proposition Structuring      | Text segmented using the <SPAN> tag into segments; structure with L-nodes. | Text segmented using <SPAN> tag into segments; structure with L-nodes anchoring YA-nodes connected to I-nodes. | [Link](default-proposition-unitiser.amfws.arg.tech/propositionUnitizer-01) |
+| **CPJ**          | Cascading Proposition Structuring             | Text segmented using the <SPAN> tag into segments; structure with L-nodes. | Text segmented using <SPAN> tag into segments; structure with L-nodes anchoring YA-nodes connected to I-nodes. | [Link](cascading-propositionUnitiser.amfws.arg.tech/propositionaliser-cascading) |
+| **DAMG**         | Argument Graph Generation                     | Segmented text; structure with I-nodes.              | Segmented text; structure with I-nodes connected with RA and CA nodes. | [Link](http://dam.amfws.arg.tech/dam-03) |
+| **DTERG**        | Argument Component Classification             | Segmented text; structure with I-nodes.              | Segmented text; structure with I-nodes connected with RA nodes. | [Link](bert-te.amfws.arg.tech/bert-te) |
+| **PDSCZ**        | Scheme-Based Classification                   | Segmented text; structure with I-nodes connected with RA nodes. | Segmented text; structure with I-nodes connected with RA nodes specified by pragma-dialectical scheme type. | [Link](http://amfws-schemeclassifier.arg.tech/schemes_clsf) |
+| **SARIM**        | xAIF File Processing                          | xAIF file containing proposition nodes.              | xAIF file containing input and new nodes (RA, CA) with related relations between nodes. | [Link](http://amfws-rp.arg.tech/somaye) |
+| **ARIR**         | Argument Graph Completion                     | xAIF file containing segmented propositional nodes.  | xAIF file with complete propositional argument graph, including RA, CA, and MA nodes, along with new edges. | [Link](http://amfws-ari.arg.tech/) |
+| **DRIG**         | Argumentation Graph Generation                | xAIF file containing I-nodes.                         | Segmented text; structure with I-nodes connected with RA, MA, and CA nodes. | [Link](vanilla-am-caasr.amfws.arg.tech/caasra) |
+| **WSCR**         | Scheme Replacement in Argumentation           | xAIF file containing propositional nodes (I) and RA relations. | xAIF file where "Default Inference" relations are replaced by specific argumentation schemes (e.g., Argument From Analogy). | [Link](http://amf-schemes.amfws.arg.tech) |
+| **PTCR**         | Proposition Classification                    | xAIF file containing propositional nodes (I).         | xAIF file with the "propositionClassifier" key containing list of propositions (I) classified into Value, Policy, and Fact types. | [Link](http://amf-ptc.amfws.arg.tech) |
+| **CASS-Moslemnejad-2025** | Evaluation Metrics                | Two comprehensive xAIF files with all information nodes and text segments. | F1 Macro/Accuracy/CASS/Text Similarity/Kappa/U-Alpha. | [Link](https://github.com/arg-tech/AMF-Evaluation-Scores) |
+| **whisper-speech-to-text-2025** | Speech-to-Text Transformation   | Audio file.                                          | xAIF with the text field populated with transcription. | [Link](realtime-backend.amfws.arg.tech/transcribe_whisper-0) |
 
-For a full list of available modules, refer to the [official documentation](#resources).
+
+
 
 ---
 
@@ -192,13 +326,28 @@ The module is built using the **Flask** framework. It accepts and outputs **xAIF
 - **Dockerized**: The module is encapsulated in a Docker container, ensuring easy deployment and scalability. The container is configured using `Dockerfile` and `docker-compose.yaml`.
 
 ### Project Structure
-The module project follows a standard web application structure, with the following key components:
-- **`config/metadata.yaml`**: Contains essential metadata about the module (e.g., name, license, version, and input/output details).
-- **`project_source_dir/`**: Contains the core application code, including the Flask routes and module logic.
-- **`boot.sh`**: A shell script to activate the virtual environment and launch the application.
-- **`docker-compose.yaml`**: Defines the Docker service and how the application is built and run.
-- **`Dockerfile`**: Specifies the Docker image, environment, and installation of dependencies.
-- **`requirements.txt`**: Lists all the Python dependencies required by the project.
+
+The project follows a standard web application structure, with the following key components:
+
+- **`config/metadata.yaml`**: This file contains essential metadata about the module, including the module name, license, version, and input/output specifications. It serves as the module's configuration and is key for integration with other systems.
+
+- **`project_source_dir/`**: This directory holds the core application code. It includes the Flask routes and the main logic of the module that handles requests, processing, and responses.
+
+- **`boot.sh`**: A shell script responsible for activating the virtual environment and launching the application. It simplifies the setup and ensures that the application runs in the correct environment.
+
+- **`docker-compose.yaml`**: Defines the Docker service and how the application is built and run within a containerized environment. The `docker-compose.yaml` file should be configured to reflect the project’s repository name. For example, in the case of the **bert-te** module, the service name in the Docker Compose file should match the repository name.
+
+  Example Docker Compose service configuration:
+  ```yaml
+  services:
+    bert-te:
+      container_name: bert_te
+      build:
+        context: . # Specify the build context
+        dockerfile: Dockerfile # Specify the Dockerfile if it's not named 'Dockerfile'
+      ports:
+        - "5002:5002" # Map port 5002 on the host to port 5002 in the container
+
 
 ### Metadata Configuration (`config/metadata.yaml`)
 The `metadata.yaml` file provides essential information about the module, such as:

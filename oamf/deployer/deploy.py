@@ -22,7 +22,7 @@ class Deployer:
         repo_name = parsed_url.path.split("/")[-1].replace(".git", "")
         return repo_name
 
-    def _loadmodule(self, name, url, module_type, route):
+    def _loadmodule(self, name, url, module_type, route, tag):
         """
         Dynamically load a module by specifying its name, repository URL, and type.
         :param name: The name or tag for the module.
@@ -30,10 +30,13 @@ class Deployer:
         :param module_type: The type of module (e.g., "repo" or "ws").
         :param route: The route or path to be used with the module.
         """
-        self.modules[name] = {
+        repo_name = self.get_repo_name_from_url_(url)
+        self.modules[tag] = {
             "url": url,
             "type": module_type,
-            'route': route
+            'route': route,
+            "name": name,
+            "repo_name": repo_name
         }
         print(f"Module '{name}' of type '{module_type}' loaded from {url}.")
 
@@ -60,7 +63,7 @@ class Deployer:
     def resolve_dependencies(self, pipeline_graph):
         # Create a dictionary to track dependencies
         module_dependencies = self._build_dependency_graph(pipeline_graph)
-        print("the whole row module_dependencies", module_dependencies)
+
 
         # List to track the visited modules
         visited = set()
@@ -207,11 +210,12 @@ class Deployer:
         deployed_modules = {}
         for url, module_type, route, tag in modules_to_load:
             module_name = self.get_repo_name_from_url(url)
+            #module_name = tag
             
             # Deploy the module only if it hasn't been deployed before
-            if module_name not in deployed_modules:
-                self._loadmodule(module_name, url, module_type, route)
-                deployed_modules[module_name] = route  # Store deployed module with its assigned route
+            if tag not in deployed_modules:
+                deployed_modules[tag] = route  # Store deployed module with its assigned route
+                self._loadmodule(module_name, url, module_type, route,tag)
             
             # Associate the tag with the actual module name
             tag_to_module[tag] = module_name  

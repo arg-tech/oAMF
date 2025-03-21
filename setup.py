@@ -11,6 +11,8 @@ setup(
     include_package_data=True,
     install_requires=[
         'PyYAML',
+        'networkx',  # Add networkx dependency
+        'pandas',    # Add pandas dependency
     ],
     entry_points={
         'console_scripts': [

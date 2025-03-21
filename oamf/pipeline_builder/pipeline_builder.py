@@ -26,7 +26,6 @@ class PipelineBuilder:
     def resolve_dependencies(self, pipeline_graph):
         # Create a dictionary to track dependencies
         module_dependencies = self._build_dependency_graph(pipeline_graph)
-        #print("the whole row module dependencies", module_dependencies)
         # List to track the visited modules
         visited = set()
 
@@ -44,106 +43,127 @@ class PipelineBuilder:
         # Check each module
         for module in module_dependencies:
             visit(module, [])
-        return module_dependencies
-
-
-
+            return module_dependencies
+        
     def new_pipeline(self, pipeline_graph_with_tags):
         """
-        Install and set up only the modules specified in the pipeline, with tag tracking.
-        :param pipeline_graph: List of module names and edges (dependencies) in the pipeline.
-        :param tag_to_module: Dictionary mapping tags to module names.
+        Install and set up only the modules specified in the pipeline, using tag tracking.
+        :param pipeline_graph_with_tags: List of tuples of tag-based edges (dependencies) in the pipeline.
         """
-
         # Convert tag-based pipeline to actual module-based pipeline
         tag_to_module = self.deployer.modules_to_load
-        pipeline_graph = [(tag_to_module[src], tag_to_module[dst]) for src, dst in pipeline_graph_with_tags]       
+        pipeline_graph = pipeline_graph_with_tags  # The graph is now entirely tag-based.
+
+        # Create a set of tags that are explicitly part of the pipeline
+        pipeline_tags = {tag for edge in pipeline_graph for tag in edge}
+
         execution_pipeline = {}  # Graph representation
         ordered_modules = self.resolve_dependencies(pipeline_graph)
 
 
-        # To track modules that have been added to the execution pipeline
+        # Track which repositories have already been deployed
+        deployed_repos = set()
+
+        # Track which tags have been processed
         added_to_pipeline = set()
 
-        def add_module(module_name, tag=None):
+        def add_module(tag):
             """
             Process and add a module to the pipeline graph, maintaining dependencies.
-            :param module_name: The name of the module to add.
-            :param tag: The tag associated with this module (for tracking).
+            :param tag: The tag associated with this module.
             """
-            if module_name in added_to_pipeline:
-                return  # Skip if the module is already processed
+            if tag in added_to_pipeline:
+                return  # Skip if the module (tag) is already processed
 
-            module = self.deployer.modules.get(module_name)
-            if module:
-                module_url = module['url']
-                module_type = module['type']
-                route = module['route']
-                destination = os.path.join(self.deployer.modules_dir, module_name)
-                try:
-                    if module_type == "repo":
-                        print(f"Processing module '{module_name}' of type '{module_type}'...")
-                        # Check if the module is already cloned
+            # Only process tags that are part of the pipeline
+            if tag not in pipeline_tags:
+                return
+
+            # Retrieve module details from the tag
+            module = self.deployer.modules.get(tag)
+            if not module:
+                print(f"Warning: No module found for tag '{tag}'. Skipping...")
+                return
+
+            module_url = module['url']
+            module_type = module['type']
+            route = module['route']
+            repo_name = module['repo_name']  # Unique repo name
+            destination = os.path.join(self.deployer.modules_dir, repo_name)
+
+            print(f"Processing module with tag '{tag}' -> Repo: '{repo_name}'")
+
+            try:
+                if module_type == "repo":
+                    # Deploy the repository only once per repo_name
+                    if repo_name not in deployed_repos:
+                        print(f"Deploying repository '{repo_name}'...")
                         if not os.path.exists(destination):
                             self.deployer.clone_repository(module_url, destination)
                         else:
-                            print(f"Module '{module_name}' already cloned. Skipping clone.")
-                        # Check if the container is already running
-                        if not self.deployer.is_container_running(module_name):
+                            print(f"Repository '{repo_name}' already cloned. Skipping clone.")
+
+                        if not self.deployer.is_container_running(repo_name):
                             self.deployer.ensure_docker_setup(destination)
                             self.deployer.build_docker_image(destination)
                             self.deployer.start_docker_container(destination)
                         else:
-                            print(f"Container for module '{module_name}' is already running. Skipping Docker setup.")
-                        # Get the service port from the compose file
-                        port = self.deployer.get_service_port_from_compose(destination, service_name=module_name)
-                        execution_pipeline[module_name] = {
-                            "name": module_name,
-                            "url": f"http://localhost:{port}/{route}",
-                            "dependencies": []  # Store dependencies in the graph
-                        }
-                    elif module_type == "ws":
-                        print(f"Module '{module_name}' is of type 'ws'. No local setup needed.")
-                        execution_pipeline[module_name] = {
-                            "name": module_name,
-                            "url": module_url,
-                            "dependencies": []  # Store dependencies in the graph
-                        }
-                    else:
-                        print(f"Unsupported module type '{module_type}' for module '{module_name}'. Skipping...")
-                except Exception as e:
-                    print(f"Failed to set up module '{module_name}': {str(e)}")
+                            print(f"Container for repository '{repo_name}' is already running. Skipping setup.")
 
-                # Mark module as added to the pipeline
-                added_to_pipeline.add(module_name)
+                        # Mark repository as deployed
+                        deployed_repos.add(repo_name)
 
-                # If a tag was passed, associate it in the execution pipeline
-                if tag:
-                    execution_pipeline[module_name]["tag"] = tag
-        # Iterate over each module and its dependencies in the resolved graph
-        for module_name, dependencies in ordered_modules.items():
-            print(f"Processing module '{module_name}' and its dependencies...")
+                    # Get the service port from the compose file
+                    port = self.deployer.get_service_port_from_compose(destination, service_name=repo_name)
+                    execution_pipeline[tag] = {
+                        "name": tag,  # Keep using the tag in the pipeline
+                        "url": f"http://localhost:{port}/{route}",
+                        "dependencies": []  # Store dependencies in the graph
+                    }
 
-            # First, process the module itself (if it hasn't been processed already)
-            # We need to ensure that we fetch the correct tag for this particular module
-            tags_for_module = [tag for tag, mod_name in tag_to_module.items() if mod_name == module_name]
-            
-            # If there are multiple tags for the same module, we associate all of them in the execution pipeline
-            for tag in tags_for_module:
-                add_module(module_name, tag)
+                elif module_type == "ws":
+                    print(f"Module '{repo_name}' is of type 'ws'. No local setup needed.")
+                    execution_pipeline[tag] = {
+                        "name": tag,
+                        "url": module_url,
+                        "dependencies": []  # Store dependencies in the graph
+                    }
+
+                else:
+                    print(f"Unsupported module type '{module_type}' for module '{tag}'. Skipping...")
+
+            except Exception as e:
+                print(f"Failed to set up module '{tag}': {str(e)}")
+
+            # Mark tag as added to the pipeline
+            added_to_pipeline.add(tag)
+
+            execution_pipeline[tag]["tag"] = tag
+
+        # Iterate over each tag and its dependencies in the resolved graph
+        for tag, dependencies in ordered_modules.items():
+            if tag not in pipeline_tags:
+                continue  # Skip tags that are not part of the pipeline
+
+            print(f"Processing module '{tag}' and its dependencies...")
+
+            # First, process the module itself
+            add_module(tag)
 
             # Then process each of its dependencies
             for dep in dependencies:
-                tags_for_module = [tag for tag, mod_name in tag_to_module.items() if mod_name == dep]
-                for tag in tags_for_module:
-                    add_module(dep,tag)
+                if dep not in pipeline_tags:
+                    continue  # Skip dependencies that are not part of the pipeline
+
+                add_module(dep)
+
                 # Add dependency relationship in the graph
-                execution_pipeline[module_name]["dependencies"].append(dep)
+                execution_pipeline[tag]["dependencies"].append(dep)
 
-
-
+        print("Final Execution Pipeline:", execution_pipeline)
         return self._create_pipeline_executor(execution_pipeline, tag_to_module)
 
+    
 
     def _create_pipeline_executor(self, execution_graph, tag_to_module):
         """
@@ -153,18 +173,33 @@ class PipelineBuilder:
         :return: Callable pipeline executor.
         """
 
-        reverse_graph = {module: [] for module in execution_graph}
+        # Collect all tags, including those from dependencies
+        all_tags = set(data["tag"] for data in execution_graph.values())  # Tags from execution_graph
+        all_tags.update(dep for module in execution_graph.values() for dep in module["dependencies"])  # Tags from dependencies
+
+        # Initialize reverse_graph correctly
+        #reverse_graph = {tag: [] for tag in all_tags}
+
+        # Ensure execution_graph contains all referenced modules, even if they have no dependencies
+        for tag in all_tags:
+            if tag not in execution_graph:
+                execution_graph[tag] = {"name": tag, "url": "", "dependencies": [], "tag": tag}  # Default structure
+
+        # Initialize reverse_graph correctly
+        reverse_graph = {tag: [] for tag in all_tags}
+
 
         # Reverse dependencies graph: Find which modules depend on each module
-        for prerequisite, dependents in execution_graph.items():
-            for dependent in dependents["dependencies"]:
-                reverse_graph[dependent].append(prerequisite)
+        for module_name, module_data in execution_graph.items():
+            for dep in module_data["dependencies"]:
+                reverse_graph[dep].append(module_name)  # Correctly store dependents
 
         print("Reverse dependency graph:", reverse_graph)
 
+        # Identify modules with no dependencies (entry points)
         executable_modules = [mod for mod, deps in reverse_graph.items() if not deps]
         module_outputs = {}
-        print("executable_modules==========", executable_modules)
+
         def pipeline_executor(input_file):
             """Executes the pipeline following the dependency graph."""
             processed_modules = set()
@@ -176,22 +211,20 @@ class PipelineBuilder:
                 module_name = execution_queue.popleft()  # Process one module at a time
                 module = execution_graph[module_name]
 
-          
-
                 # Get the tag for the current module
                 module_tag = module.get("tag", "Unknown")
 
-                # Identify the module providing the input for this module
-                input_sources = [dep for dep in reverse_graph[module_name] if dep in module_outputs]
+                # Identify the modules providing input for this module
+                input_sources = [dep for dep in reverse_graph.get(module_name, []) if dep in module_outputs]
                 input_modules = [tag_to_module.get(dep, dep) for dep in input_sources]
 
-                # Print execution details, including the module that provides the input
+                # Print execution details
                 input_details = " and ".join(input_modules) if input_modules else "Original input"
-                print(f"Executing module '{module_name}' (tag: {module_tag}), input provided by {module['url']}...")
+                print(f"Executing module '{module_name}' (tag: {module_tag})")
 
                 self.deployer.wait_for_service(module['url'])
 
-                input_files = [module_outputs[dep] for dep in reverse_graph[module_name] if dep in module_outputs]
+                input_files = [module_outputs[dep] for dep in input_sources if dep in module_outputs]
                 if not input_files:
                     input_files = [input_file]  # Default to original input if no dependencies
 
@@ -205,7 +238,6 @@ class PipelineBuilder:
 
                         if response.status_code == 200:
                             json_response = response.json()
-                            #print(f"Module '{module_name}' output: {json_response}")
 
                             with tempfile.NamedTemporaryFile(delete=False, mode='w', encoding='utf-8', suffix='.json') as temp_file:
                                 json.dump(json_response, temp_file)
@@ -227,11 +259,15 @@ class PipelineBuilder:
                     except Exception as e:
                         logging.error(f"Error processing module '{module_name}': {str(e)}")
                         break
-                previous_module = module_tag
+
+
 
             return module_outputs.get(list(execution_graph.keys())[-1], input_file)
 
         return pipeline_executor
+
+
+
 
 
     

@@ -17,6 +17,12 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+dependencies = [
+  "networkx",
+  "pandas",
+  "PyYAML"
+]
+
 [project.urls]
 Homepage = "https://github.com/arg-tech/oamf"
 Issues = "https://github.com/arg-tech/oamf/issues"
