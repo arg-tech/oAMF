@@ -1,513 +1,261 @@
 
-# AMF (Argument Mining Framework) 
-
+## 📌 Open Argument Mining Framework (oAMF)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/arg-tech/amf) 
 ![PyPI](https://img.shields.io/pypi/v/argument-mining-framework) 
 ![License](https://img.shields.io/badge/License-GPL%203.0-blue)
 
 
+oAMF is a **modular, open-source framework** designed for **end-to-end argument mining (AM)**. It empowers researchers and developers to construct, execute, and extend **customizable AM pipelines** using a variety of modules. The framework supports **multiple interfaces**, making it highly accessible to users with different technical backgrounds.
 
+## ✨ Key Features
 
-AMF is a comprehensive toolkit designed to streamline and unify various argument mining modules into a single platform. By leveraging the Argument Interchange Format (AIF), AMF enables seamless communication between different components, including segmenters, turnators, argument relation identifiers, and argument scheme classifiers.
+- **🔗 15+ Open-Source AM Modules**: Covering a broad range of argument mining tasks.
+- **🖥️ Multiple Interfaces**:
+  - **Web Interface**: Execute predefined pipelines directly from your browser.
+  - **Drag-and-Drop Interface**: Create pipelines visually with **n8n**.
+  - **Python API**: Define and execute pipelines programmatically.
+- **🛠️ Modular & Extendable**: Easily add new modules that interact via the standardized **xAIF format**.
+- **📡 Local & Remote Execution**: Modules can be deployed locally or accessed as remote services.
 
 ---
 
-## 🚀 Features
-
-- **Argument Segmentator**: Identifies and segments arguments within argumentative text.
-- **Turninator**: Determines dialogue turns within conversations.
-- **Argument Relation Identification**: Identifies argument relationships between argument units.
-- **Argument Scheme Classification**: Classifies arguments based on predefined schemes.
-
-## 📚 Resources
-
-- [Documentation & Tutorials](https://wiki.arg.tech/books/amf)
-- [Online Demo](https://n8n.arg.tech/workflow/2)
-- [GitHub Source](https://github.com/arg-tech/amf)
-- [PyPI Package](https://pypi.org/project/argument-mining-framework/)
-
 ## 📖 Table of Contents
 
-1. [Overview](#overview)
-2. [Installation](#installation)
-3. [Components](#components)
-    - [Argument Segmentor](#argument-segmentor)
-    - [Turnator](#turnator)
-    - [Argument Relation Identifier](#argument-relation-identifier)
-    - [Argument Scheme Classifier](#argument-scheme-classifier)
-4. [Usage](#usage)
-    - [Predictor Example](#predictor-example)
-    - [Full Workflow Example](#full-workflow-example)
-5. [API Reference](#api-reference)
-6. [License](#license)
+1. [Installation](#installation)
+2. [Usage](#usage)
+   - [Deploying and Loading Modules](#deploying-and-loading-modules)
+   - [Creating and Running an AM Pipeline](#creating-and-running-an-am-pipeline)
+   - [Drag-and-Drop Interface](#drag-and-drop-interface)
+   - [Web Interface](#web-interface)
+3. [📝 xAIF (Extended Argument Interchange Format)](#xaif-extended-argument-interchange-format)
+4. [📚 Available Modules](#available-modules)
+5. [📦 Module Development](#module-development)
+6. [📌 Release Information](#release-information)
+7. [📜 License](#license)
+8. [📚 Resources](#resources)
 
-## 📝 Overview
+---
 
-AMF provides a modular approach to argument mining, integrating various components into a cohesive framework. The main features include:
+## 🛠️ Installation
 
-- **Argument Segmentator:** Identifies and segments arguments within argumentative text.
-- **Turninator:** Determines dialogue turns within conversations.
-- **Argument Relation Identification:** Identifies argument relationships between argument units.
-- **Argument Scheme Classification:** Classifies arguments based on predefined schemes.
+To install the oAMF library, run:
 
-
-
-
-## 🛠 Installation
-<details>
-  <summary>Prerequisites & Setup</summary>
-
-  <p>Ensure you have Python installed on your system. AMF is compatible with Python 3.6 and above.</p>
-
-  <h3>Step 1: Create a Virtual Environment</h3>
-  <p>It's recommended to create a virtual environment to manage dependencies:</p>
-  <pre><code>python -m venv amf-env</code></pre>
-
-  <p>Activate the virtual environment:</p>
-  <ul>
-    <li><strong>Windows:</strong>
-      <pre><code>.\amf-env\Scripts\activate</code></pre>
-    </li>
-    <li><strong>macOS/Linux:</strong>
-      <pre><code>source amf-env/bin/activate</code></pre>
-    </li>
-  </ul>
-
-  <h3>Step 2: Install Dependencies</h3>
-  <p>With the virtual environment activated, install AMF using pip:</p>
-  <pre><code>pip install argument-mining-framework</code></pre>
-  <p>This command will install the latest version of AMF along with its dependencies.</p>
-
-  <h3>Additional Setup Instructions</h3>
-  <p>After installing the <code>argument-mining-framework</code> package, make sure to download the necessary NLTK data and spaCy models:</p>
-  <pre><code>python -m nltk.downloader stopwords
-python -m nltk.downloader wordnet
-python -m nltk.downloader averaged_perceptron_tagger_eng
-python -m nltk.downloader omw-1.4
-
-python -m spacy download en_core_web_lg
-python -m spacy download en_core_web_sm</code></pre>
-</details>
-
-
-
-
-
-## 🧩 Components
-
-### Argument Segmentor
-
-The Argument Segmentor component is responsible for detecting and segmenting arguments within text. 
-
-[Read More](http://default-segmenter.amfws.arg.tech/segmenter-01)
-
-### Turnator
-
-The Turnator identifies and segments dialogue turns, facilitating the analysis of conversations and interactions within texts. This module is particularly useful for dialogue-based datasets.
-
-[Read More](http://default-turninator.amfws.arg.tech/turninator-01)
-
-### Argument Relation Identifier
-
-This component identifies and categorizes the relationships between argument units.
-
-[Read More](http://bert-te.amfws.arg.tech/bert-te)
-
-### Argument Scheme Classifier
-
-The Argument Scheme Classifier categorizes arguments based on predefined schemes, enabling structured argument analysis.
-
-[Read More](http://amf-schemes.amfws.arg.tech)
-
-## 🧑‍💻 Usage
-
-### Predictor Example
-
-Below is an example of how to use the AMF Predictor class to generate an argument map using an input provided based on AIF:
-
-```python
-from argument_mining_framework.argument_relation.predictor import ArgumentRelationPredictor
-import json
-
-# Initialize Predictor
-predictor = ArgumentRelationPredictor(model_type="dialogpt", variant="vanilla")
-
-# Example XAIF structure
-xaif = {
-    "AIF": {
-        "nodes": [
-            {"nodeID": "1", "text": "THANK YOU", "type": "I", "timestamp": "2016-10-31 17:17:34"},
-            {"nodeID": "2", "text": "COOPER : THANK YOU", "type": "L", "timestamp": "2016-11-10 18:34:23"},
-            # Add more nodes as needed
-        ],
-        "edges": [
-            {"edgeID": "1", "fromID": "1", "toID": "20", "formEdgeID": "None"},
-            {"edgeID": "2", "fromID": "20", "toID": "3", "formEdgeID": "None"}
-            # Add more edges as needed
-        ],
-        "locutions": [],
-        "participants": []
-    },
-    "text": "people feel that they have been treated disrespectfully..."
-}
-
-# Convert XAIF structure to JSON string
-xaif_json = json.dumps(xaif)
-
-# Predict argument relations
-result_map = predictor.argument_map(xaif_json)
-print(result_map)
+```bash
+pip install oamf
 ```
 
+This package allows you to locally deploy and execute AM pipelines with integrated modules.
 
-### Full Workflow Example
+---
 
-In this section, we demonstrate how to use multiple components of the AMF framework in a complete argument mining workflow. This example shows how to process a text input through the Turninator, Segmenter, Propositionalizer, and Argument Relation Predictor components and visualize the output.
+## 🚀 Usage
+
+### 📂 Deploying and Loading Modules
+
+Modules can be loaded from **GitHub repositories** (for local execution) or **web services** (for remote execution). Below is an example of loading and deploying modules:
 
 ```python
-import logging
-from argument_mining_framework.loader import Module
+from oamf import oAMF
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+oamf = oAMF()
 
-def process_pipeline(input_data: str) -> None:
-    """Process input data through the entire argument mining pipeline."""
+# Modules to load: (URL, type ['repo' or 'ws'], deployment route, tag)
+modules_to_load = [
+    ("https://github.com/arg-tech/default_turninator.git", "repo", "turninator-01", "turninator"),
+    ("https://github.com/arg-tech/default_segmenter.git", "repo", "segmenter-01", "segmenter"),
+    ("http://bert-te.amfws.arg.tech/bert-te", "ws", "bert-te", "bert-te")
+]
 
-    # Initialize components
-    modules = {
-        'turninator': Module('turninator'),
-        'segmenter': Module('segmenter'),
-        'propositionalizer': Module('propositionalizer'),
-        'argument_relation': Module('argument_relation', "DAM", "01"),
-        'hypothesis': Module('hypothesis', "roberta", "vanilla"),
-        'scheme': Module('scheme', "roberta", "vanilla"), 
-        'visualiser': Module('visualiser')
-    }
-
-    # Step 1: Turninator
-    turninator_output = modules['turninator'].get_turns(input_data, True)
-    logging.info('Turninator output: %s', turninator_output)
-
-    # Step 2: Segmenter
-    segmenter_output = modules['segmenter'].get_segments(turninator_output)
-    logging.info('Segmenter output: %s', segmenter_output)
-
-    # Step 3: Propositionalizer
-    propositionalizer_output = modules['propositionalizer'].get_propositions(segmenter_output)
-    logging.info('Propositionalizer output: %s', propositionalizer_output)
-
-    # Step 4: Argument Relation Prediction
-    argument_map_output = modules['argument_relation'].get_argument_map(propositionalizer_output)
-    logging.info('Argument relation prediction output: %s', argument_map_output)
-
-    # Additional Analysis
-    claims = modules['argument_relation'].get_all_claims(argument_map_output)
-    logging.info("Extracted claims: %s", claims)
-
-    evidence = modules['argument_relation'].get_evidence_for_claim(
-        "But this isn’t the time for vaccine nationalism", argument_map_output)
-    logging.info("Evidence for claim: %s", evidence)
-
-    # Hypothesis Prediction
-    hypothesis_results = modules['hypothesis'].predict([
-        "But this isn’t the time for vaccine nationalism",
-        "Vaccine is useful to prevent infections."
-    ])
-    logging.info("Hypothesis prediction: %s", hypothesis_results)
-
-    # Scheme Prediction
-    scheme_results = modules['scheme'].predict([
-        "But this isn’t the time for vaccine nationalism",
-        "Vaccine is useful to prevent infections."
-    ])
-    logging.info("Scheme prediction: %s", scheme_results)
-
-    # Visualize the argument map
-    modules['visualiser'].visualise(argument_map_output)
-
-
-def main() -> None:
-    """Main function to run the argument mining pipeline."""
-    input_data = (
-        """Liam Halligan: Vaccines mark a major advance in human achievement since the """
-        """enlightenment into the 19th Century and Britain’s been at the forefront of """
-        """those achievements over the years and decades. But this isn’t the time for """
-        """vaccine nationalism. I agree we should congratulate all the scientists, those """
-        """in Belgium, the States, British scientists working in international teams here """
-        """in the UK, with AstraZeneca.\n"""
-        """Fiona Bruce: What about the logistical capabilities? They are obviously """
-        """forefront now, now we’ve got a vaccine that’s been approved. It’s good -- I’m """
-        """reassured that the British Army are going to be involved. They’re absolute world """
-        """experts at rolling out things, complex logistic capabilities. This is probably """
-        """going to be the biggest logistical exercise that our armed forces have undertaken """
-        """since the Falklands War, which I’m old enough to remember, just about. So, as a """
-        """neutral I’d like to see a lot of cross-party cooperation, and I’m encouraged with """
-        """Sarah’s tone, everybody wants to see us getting on with it now. They don’t want """
-        """to see competition on whose vaccine is best. There will be some instances where """
-        """the Pfizer vaccine works better, another where you can’t have cold refrigeration, """
-        """across the developing world as well, a cheaper vaccine like the AstraZeneca works """
-        """better. Let’s keep our fingers crossed and hope we make a good job of this."""
-    )
-
-    process_pipeline(input_data)
-
-
-if __name__ == "__main__":
-    main()
+# Load and deploy modules
+oamf.load_modules(modules_to_load)
 ```
 
-#### Output
+### 🔄 Creating and Running an AM Pipeline
 
-<details>
-<summary>Click to expand the output in JSON format</summary>
+An AM pipeline is defined as a directed graph where each module processes and passes data to the next module. Here's how you define and execute a pipeline:
+
+```python
+# Define the pipeline using module tags
+pipeline_graph = [
+    ("turninator", "segmenter"),   # "turninator" outputs to "segmenter"
+    ("segmenter", "bert-te")      # "segmenter" outputs to "bert-te"
+]
+
+# Execute the pipeline using the defined workflow and an input file in xAIF format
+oamf.pipelineExecutor(pipeline_graph, input_file)
+```
+
+### 🖱️ Drag-and-Drop Interface
+
+Users can create AM pipelines visually in **n8n**, a workflow automation tool. In this interface, modules are represented as **nodes** that you can connect and execute. 
+
+
+![n8n Drag-and-Drop Interface](assets/n8n.jpeg)
+
+
+The workflow can also be exported as JSON and executed using the oAMF API. Example:
+
+```python
+# Override the manually defined pipeline with one created using n8n (if applicable)
+oamf.pipelineExecutor(pipeline_graph, input_file, workflow_file)
+```
+
+### 🌐 Web Interface
+
+The web interface allows users to upload **text/xAIF files**, select pipelines, and execute AM tasks without writing any code. Access the web interface here: [oAMF Web Interface](https://arg-tech.github.io/oAMF/).
+
+![Web Page](assets/home.jpeg)
+
+---
+
+## 📝 xAIF (Extended Argument Interchange Format)
+
+oAMF uses **xAIF** as a standard format for representing argument structures. Below is an example of xAIF in JSON format:
 
 ```json
 {
-  "AIF": {
-    "nodes": [
-      {
-        "text": "Vaccines mark a major advance in human achievement since the enlightenment into the 19th Century and Britain’s been at the forefront of those achievements over the years and decades",
-        "type": "L",
-        "nodeID": 2
-      },
-      {
-        "text": "But this isn’t the time for vaccine nationalism",
-        "type": "L",
-        "nodeID": 3
-      },
-      {
-        "text": "I agree we should congratulate all the scientists, those in Belgium, the States, British scientists working in international teams here in the UK, with AstraZeneca",
-        "type": "L",
-        "nodeID": 4
-      },
-      {
-        "text": "What about the logistical capabilities",
-        "type": "L",
-        "nodeID": 5
-      },
-      {
-        "text": "They are obviously forefront now, now we’ve got a vaccine that’s been approved",
-        "type": "L",
-        "nodeID": 6
-      },
-      {
-        "text": "It’s good -- I’m reassured that the British Army are going to be involved",
-        "type": "L",
-        "nodeID": 7
-      },
-      {
-        "text": "They’re absolute world experts at rolling out things, complex logistic capabilities",
-        "type": "L",
-        "nodeID": 8
-      },
-      {
-        "text": "This is probably going to be the biggest logistical exercise that our armed forces have undertaken since the Falklands War, which I’m old enough to remember, just about",
-        "type": "L",
-        "nodeID": 9
-      },
-      {
-        "text": "So, as a neutral I’d like to see a lot of cross-party cooperation, and I’m encouraged with Sarah’s tone, everybody wants to see us getting on with it now",
-        "type": "L",
-        "nodeID": 10
-      },
-      {
-        "text": "They don’t want to see competition on whose vaccine is best",
-        "type": "L",
-        "nodeID": 11
-      },
-      {
-        "text": "There will be some instances where the Pfizer vaccine works better, another where you can’t have cold refrigeration, across the developing world as well, a cheaper vaccine like the AstraZeneca works better",
-        "type": "L",
-        "nodeID": 12
-      },
-      {
-        "text": "Let’s keep our fingers crossed and hope we make a good job of this",
-        "type": "L",
-        "nodeID": 13
-      },
-      {
-        "text": "Vaccines mark a major advance in human achievement since the enlightenment into the 19th Century and Britain’s been at the forefront of those achievements over the years and decades",
-        "type": "I",
-        "nodeID": 14
-      },
-      {
-        "text": "Default Illocuting",
-        "type": "YA",
-        "nodeID": 15
-      },
-      {
-        "text": "But this isn’t the time for vaccine nationalism",
-        "type": "I",
-        "nodeID": 16
-      },
-      {
-        "text": "Default Illocuting",
-        "type": "YA",
-        "nodeID": 17
-      },
-      {
-        "text": "I agree we should congratulate all the scientists, those in Belgium, the States, British scientists working in international teams here in the UK, with AstraZeneca",
-        "type": "I",
-        "nodeID": 18
-      },
-      {
-        "text": "Default Illocuting",
-        "type": "YA",
-        "nodeID": 19
-      },
-      {
-        "text": "What about the logistical capabilities",
-        "type": "I",
-        "nodeID": 20
-      },
-      {
-        "text": "Default Illocuting",
-        "type": "YA",
-        "nodeID": 21
-      },
-      {
-        "text": "They are obviously forefront now, now we’ve got a vaccine that’s been approved",
-        "type": "I",
-        "nodeID": 22
-      },
-      {
-        "text": "Default Illocuting",
-        "type": "YA",
-        "nodeID": 23
-      },
-      {
-        "text": "It’s good -- I’m reassured that the British Army are going to be involved",
-        "type": "I",
-        "nodeID": 24
-      },
-      {
-        "text": "Default Illocuting",
-        "type": "YA",
-        "nodeID": 25
-      },
-      {
-        "text": "They’re absolute world experts at rolling out things, complex logistic capabilities",
-        "type": "I",
-       
-
- "nodeID": 26
-      },
-      {
-        "text": "Default Illocuting",
-        "type": "YA",
-        "nodeID": 27
-      },
-      {
-        "text": "This is probably going to be the biggest logistical exercise that our armed forces have undertaken since the Falklands War, which I’m old enough to remember, just about",
-        "type": "I",
-        "nodeID": 28
-      },
-      {
-        "text": "Default Illocuting",
-        "type": "YA",
-        "nodeID": 29
-      },
-      {
-        "text": "So, as a neutral I’d like to see a lot of cross-party cooperation, and I’m encouraged with Sarah’s tone, everybody wants to see us getting on with it now",
-        "type": "I",
-        "nodeID": 30
-      },
-      {
-        "text": "Default Illocuting",
-        "type": "YA",
-        "nodeID": 31
-      },
-      {
-        "text": "They don’t want to see competition on whose vaccine is best",
-        "type": "I",
-        "nodeID": 32
-      },
-      {
-        "text": "Default Illocuting",
-        "type": "YA",
-        "nodeID": 33
-      },
-      {
-        "text": "There will be some instances where the Pfizer vaccine works better, another where you can’t have cold refrigeration, across the developing world as well, a cheaper vaccine like the AstraZeneca works better",
-        "type": "I",
-        "nodeID": 34
-      },
-      {
-        "text": "Default Illocuting",
-        "type": "YA",
-        "nodeID": 35
-      },
-      {
-        "text": "Let’s keep our fingers crossed and hope we make a good job of this",
-        "type": "I",
-        "nodeID": 36
-      },
-      {
-        "text": "Default Illocuting",
-        "type": "YA",
-        "nodeID": 37
-      }
-    ]
-  }
+  "nodes": [
+    { "id": "n1", "text": "Climate change is real.", "type": "claim" },
+    { "id": "n2", "text": "Scientists have provided evidence.", "type": "premise" }
+  ],
+  "edges": [
+    { "from": "n2", "to": "n1", "relation": "supports" }
+  ]
 }
 ```
 
-</details>
+xAIF ensures interoperability between AM modules. oAMF includes the `xaif` library, which allows you to create, load, and manipulate xAIF data structures. Example usage:
+
+```python
+# Ensure you have the latest version of xaif (pip install xaif)
+from xaif import AIF
+
+# Sample xAIF JSON with 2 L nodes and 2 I nodes
+aif_data = {"AIF": {"nodes": [
+      {"nodeID": 0, "text": "Example L node 1", "type": "L"},
+      {"nodeID": 1, "text": "Example L node 2", "type": "L"},
+      {"nodeID": 2, "text": "Example I node 1", "type": "I"},
+      {"nodeID": 3, "text": "Example I node 2", "type": "I"},
+      {"nodeID": 4, "text": "Default Inference", "type": "RA"}
+    ],
+    "edges": [
+      {"edgeID": 0, "fromID": 0, "toID": 2},
+      {"edgeID": 1, "fromID": 1, "toID": 3},
+      {"edgeID": 2, "fromID": 2, "toID": 4},
+      {"edgeID": 4, "fromID": 2, "toID": 3}
+    ],
+    "locutions": [{"nodeID": 0, "personID": 0}],
+    "participants": [{"firstname": "Speaker", "participantID": 0, "surname": "Name"}]
+  },
+   "dialog": True
+}
+
+aif = AIF(aif_data)  # Initialize AIF object with xAIF data
+# Or create an xAIF structure from raw text:
+# aif = AIF("here is the text.")
+
+# 1. Adding components
+aif.add_component(component_type="locution", text="Example L node 3.", speaker="Another Speaker")  # ID 5 assigned
+aif.add_component(component_type="proposition", Lnode_ID=5, proposition="Example I node 3.")  # ID 6 assigned to I-Node
+aif.add_component(component_type="argument_relation", relation_type="RA", iNode_ID2=3, iNode_ID1=6)  # Creating relation
+
+print(aif.xaif)  # Print the generated xAIF data
+print(aif.get_csv("argument-relation"))  # Export to CSV format
+```
+
+---
+
+## 📚 Available Modules
+
+oAMF includes a variety of argument mining modules, each designed for different tasks:
+
+| Module          | Task                                   | URL                                                   |
+|-----------------|----------------------------------------|-------------------------------------------------------|
+| **Turninator**  | Segmentation                           | [Repo](https://github.com/arg-tech/default_turninator) |
+| **BERT-TE**     | Argument Component Classification      | [Service](http://bert-te.amfws.arg.tech/bert-te)      |
+| **ToulminMapper**| Identifies Toulmin Model Components    | [Repo](https://github.com/arg-tech/ToulminMapper)     |
+| **ArgumenText** | Argument Quality Assessment            | [Repo](https://github.com/arg-tech/ArgumentQuality)   |
+
+For a full list of available modules, refer to the [official documentation](#resources).
+
+---
 
 
-## ⚙️ API Reference
 
-For detailed API documentation, please refer to the [official documentation](https://wiki.arg.tech/books/amf) or 
-check out the source code on [GitHub](https://github.com/arg-tech/amf).
+## 📦 Module Development
 
-## 🤝 Contributing
+To develop a custom oAMF module, you need to create a web service that is **dockerized** for portability and scalability. 
+The module is built using the **Flask** framework. It accepts and outputs **xAIF** data, making it compatible with oAMF's argument mining tasks.
 
-We welcome contributions to AMF! To get started:
+### Key Features of an oAMF Module:
+- **Web Service**: The module exposes a set of HTTP endpoints to interact with the module through HTTP requests.
+- **Dockerized**: The module is encapsulated in a Docker container, ensuring easy deployment and scalability. The container is configured using `Dockerfile` and `docker-compose.yaml`.
 
-1. **Fork the Repository**  
-   Fork AMF to your GitHub account.
+### Project Structure
+The module project follows a standard web application structure, with the following key components:
+- **`config/metadata.yaml`**: Contains essential metadata about the module (e.g., name, license, version, and input/output details).
+- **`project_source_dir/`**: Contains the core application code, including the Flask routes and module logic.
+- **`boot.sh`**: A shell script to activate the virtual environment and launch the application.
+- **`docker-compose.yaml`**: Defines the Docker service and how the application is built and run.
+- **`Dockerfile`**: Specifies the Docker image, environment, and installation of dependencies.
+- **`requirements.txt`**: Lists all the Python dependencies required by the project.
 
-2. **Clone Your Fork**  
-   ```bash
-   git clone https://github.com/your-username/amf.git
-   ```
+### Metadata Configuration (`config/metadata.yaml`)
+The `metadata.yaml` file provides essential information about the module, such as:
+```yaml
+Name: "Name of the Module"
+Date: "2024-10-01"
+Originator: "Author"
+License: "Your License"
+AMF_Tag: Your_tag_name
+Domain: "Dialog"
+Training Data: "Annotated corpus X"
+Citation: ""
+Variants:
+  - name: 0 version: null
+  - name: 1 version: null
+Requires: text
+Outputs: segments
+```
 
-3. **Create a Branch**  
-   ```bash
-   git checkout -b my-feature-branch
-   ```
+### Flask Application Routes
+The Flask application defines the following routes:
+- **Index Route (`/`)**: Displays the contents of the `README.md` file as documentation.
+- **AMF Module Route**: This route can be named according to the module's function.
+  - **POST requests**: Used to upload an **xAIF** file and process it with the module logic. The response is a JSON object containing the updated **xAIF** data.
+  - **GET requests**: Provides access to documentation and metadata.
 
-4. **Make Changes**  
-   Implement your feature or fix. Follow our [guidelines](CONTRIBUTING.md).
+### How to Develop an oAMF Module
+To create a custom oAMF module, follow these general steps:
 
-5. **Test Your Changes**  
-   Add and run tests to ensure everything works.
+1. **Clone the NOOP Template**: Start by cloning the [NOOP template](https://github.com/arg-tech/AMF_NOOP).
+2. **Modify Metadata**: Update `metadata.yaml` with details such as the module's name, license, inputs/outputs, and other relevant information.
+3. **Implement Core Logic**: Modify `routes.py` to define the core functionality of the module.
+4. **Integrate with xAIF**: Use the `xaif` library to manipulate **xAIF** data according to your module's needs.
+5. **Configure Docker**: Set up the `Dockerfile` and `docker-compose.yaml` to ensure the module is dockerized for easy deployment.
+6. **Documentation**: Update the `README.md` file with instructions for using the module.
 
-6. **Commit and Push**  
-   ```bash
-   git add .
-   git commit -m "Description of changes"
-   git push origin my-feature-branch
-   ```
-
-7. **Create a Pull Request**  
-   Submit a PR on GitHub with details about your changes.
-
-### Resources
-
-- [Contributing Guidelines](CONTRIBUTING.md)
-- [Issue Tracker](https://github.com/arg-tech/amf/issues)
-
-Thank you for contributing!
+---
 
 
-## 📝 License
 
-The AMF is licensed under the GNU General Public License (GPL) v3.0, with additional custom terms.
+## 📜 License
 
-### Custom License Terms
-- **Commercial Use**: To use this software for commercial purposes, please contact us for licensing arrangements.
-- **Non-commercial Use**: You may use, modify, and distribute this software freely for non-commercial purposes, as long as you adhere to the GPL v3.0 terms.
+oAMF is licensed under the **Apache 2.0 License**, allowing free use, modification, and distribution. For more details, see the [LICENSE](https://github.com/arg-tech/oAMF/blob/main/LICENSE) file.
 
-For more detailed information about the GPL v3.0 license, visit the [GPL License](https://www.gnu.org/licenses/gpl-3.0.html) page.
+---
+
+## 📚 Resources
+
+- 📖 **Documentation & Tutorials**: [Read Docs](https://docs.arg.tech/oAMF)
+- 🖥️ **Web Page**: [Try it here](https://arg-tech.github.io/oAMF/)
+- 🖥️ **n8n Demo**: [Try it here](https://n8n.arg.tech/workflow/2)
+- 🛠️ **GitHub Source**: [oAMF GitHub](https://github.com/arg-tech/amf)
+- 📦 **PyPI Package**: [oAMF on PyPI](https://pypi.org/project/oamf/)
+
+---
+
+### 🚀 Happy Argument Mining with oAMF!
+
+---
+
