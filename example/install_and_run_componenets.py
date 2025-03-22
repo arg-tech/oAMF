@@ -16,8 +16,10 @@ workflow_file = "/Users/debelagemechu/projects/oAMF/example/workflow.json"  # Wo
 modules_to_load = [
     ("https://github.com/arg-tech/default_turninator.git", "repo", "turninator-01", "turninator1"),
     ("https://github.com/arg-tech/default_turninator.git", "repo", "turninator-01", "turninator2"),
-    ("https://github.com/arg-tech/proposition-unitizer.git", "repo", "propositionUnitizer-01", "propositionUnitiser1"),
-     ("https://github.com/arg-tech/proposition-unitizer.git", "repo", "propositionUnitizer-01", "propositionUnitiser2"),
+    #("https://github.com/arg-tech/proposition-unitizer.git", "repo", "propositionUnitizer-01", "propositionUnitiser1"),
+     #("https://github.com/arg-tech/proposition-unitizer.git", "repo", "propositionUnitizer-01", "propositionUnitiser2"),
+    ("http://default-proposition-unitiser.amfws.arg.tech/propositionUnitizer-01", "ws", "propositionUnitizer-01", "propositionUnitiser1"),
+     ("http://default-proposition-unitiser.amfws.arg.tech/propositionUnitizer-01", "ws", "propositionUnitizer-01", "propositionUnitiser2"),
     ("http://bert-te.amfws.arg.tech/bert-te", "ws", "bert-te", "bert-te3"),
     ("https://github.com/arg-tech/bert-te.git", "repo", "bert-te", "bert-te1"),
     ("https://github.com/arg-tech/bert-te.git", "repo", "bert-te", "bert-te2"),
@@ -47,7 +49,7 @@ pipeline_graph = [
 
 # Execute the pipeline using the defined workflow and input file in xAIF format
 
-oamf.pipelineExecutor(pipeline_graph, input_file)
+output = oamf.pipelineExecutor(pipeline_graph, input_file)
 
 
 

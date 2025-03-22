@@ -199,6 +199,7 @@ class PipelineBuilder:
         # Identify modules with no dependencies (entry points)
         executable_modules = [mod for mod, deps in reverse_graph.items() if not deps]
         module_outputs = {}
+        module_outputs_json = {}
 
         def pipeline_executor(input_file):
             """Executes the pipeline following the dependency graph."""
@@ -243,6 +244,7 @@ class PipelineBuilder:
                                 json.dump(json_response, temp_file)
                                 temp_file_path = temp_file.name
                                 module_outputs[module_name] = temp_file_path
+                                module_outputs_json[module_name] = json_response
                             print(f"Successfully processed '{module_name}'. Output saved at {temp_file_path}")
 
                             processed_modules.add(module_name)
@@ -262,7 +264,7 @@ class PipelineBuilder:
 
 
 
-            return module_outputs.get(list(execution_graph.keys())[-1], input_file)
+            return module_outputs.get(list(execution_graph.keys())[-1], input_file), module_outputs_json.get(list(execution_graph.keys())[-1], input_file)
 
         return pipeline_executor
 

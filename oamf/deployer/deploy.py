@@ -208,6 +208,7 @@ class Deployer:
         # Load modules dynamically, avoiding redundant deployments
         # Dictionary to track deployed modules (ensuring each module is deployed only once)
         deployed_modules = {}
+        
         for url, module_type, route, tag in modules_to_load:
             module_name = self.get_repo_name_from_url(url)
             #module_name = tag

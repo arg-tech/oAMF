@@ -19,8 +19,8 @@ class oAMF:
     def pipelineExecutor(self, pipeline_graph_with_tags,intput_file, workflow_file=None):
         if not workflow_file:
             pipeline_executor = self.pipe_builder.new_pipeline(pipeline_graph_with_tags)
-            result_file = pipeline_executor(intput_file)
-            return(f"Pipeline execution completed. Final result stored at: {result_file}")
+            result_file_path, result_json = pipeline_executor(intput_file)
+            return(f"Pipeline execution completed. Final result stored at: {result_file_path}", result_json)
         else:
             # Process the pipeline
             executor = N8NPipelineExecutor(workflow_file, intput_file)
