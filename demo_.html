@@ -850,6 +850,7 @@
         formData.append('data', new Blob([JSON.stringify(jsonData)], { type: 'application/json' }), 'input.json');
 
         fetch(svgServiceUrl, {
+            mode: 'no-cors',
             method: 'POST',
             body: formData,
         })
