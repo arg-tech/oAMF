@@ -855,17 +855,11 @@
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
-          return response.text(); // SVG response is expected as text
+          return response.text(); // Response will be handled as text
         })
         .then(responseText => {
-          // Check if the response is HTML instead of SVG
-          if (responseText.includes('<html>')) {
-            console.error("Received HTML instead of SVG:", responseText);
-            document.getElementById('svgContainer').innerHTML = `<span class="error">Error: HTML response received instead of SVG. Please check the service.</span>`;
-          } else {
-            // If the response is SVG (or expected text data), insert it into the container
-            document.getElementById('svgContainer').innerHTML = responseText;
-          }
+          // Directly insert the response as it is (without checks)
+          document.getElementById('svgContainer').innerHTML = responseText;
         })
         .catch(error => {
           console.error('Error:', error);
@@ -912,6 +906,7 @@
     document.getElementById('workflow2Checkbox').addEventListener('change', toggleWorkflows);
     toggleWorkflows();
 </script>
+
 
 
 </body>
