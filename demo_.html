@@ -852,22 +852,32 @@
         body: formData,
       })
         .then(response => {
-          console.log('SVG Service Response:', response); // Log full response object
+          console.log('SVG Service Response:', response); // Log the response object
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
-          return response.text(); // Parse as text (for HTML/SVG/etc.)
+          return response.arrayBuffer(); // Use arrayBuffer() for binary data
         })
-        .then(responseText => {
-          console.log('SVG Service Response Body:', responseText); // Log the response body (HTML or SVG)
+        .then(responseBuffer => {
+          console.log('SVG Service Response ArrayBuffer:', responseBuffer); // Log the binary data
           
-          // Check if response is HTML (this will typically mean it's an error or non-SVG content)
-          if (responseText.includes('<html>')) {
-            console.error('Received HTML response instead of SVG:', responseText);
-            document.getElementById('svgContainer').innerHTML = `<span class="error">Error: Received HTML response instead of SVG.</span>`;
+          // If it's an SVG (or binary data like a compressed image), handle it as needed.
+          // For example, convert binary to base64 for images or directly to SVG for SVG content:
+          
+          const array = new Uint8Array(responseBuffer);
+          const base64Data = btoa(String.fromCharCode(...array)); // Convert binary to base64
+
+          const svgContainer = document.getElementById('svgContainer');
+          
+          // If it's SVG, directly embed it, otherwise convert the base64 to an image:
+          const svgText = new TextDecoder().decode(array); // Try to decode the response to a text string (SVG)
+
+          // If decoding as SVG text works, display it:
+          if (svgText.startsWith('<svg')) {
+            svgContainer.innerHTML = svgText; // Display SVG directly
           } else {
-            // If it's not HTML, display it (assume it's SVG or other expected content)
-            document.getElementById('svgContainer').innerHTML = responseText;
+            // Otherwise, create an image tag for the base64 data
+            svgContainer.innerHTML = `<img src="data:image/svg+xml;base64,${base64Data}" alt="SVG Image">`;
           }
         })
         .catch(error => {
