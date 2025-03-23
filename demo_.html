@@ -828,7 +828,7 @@
 
 
 
-  <script>
+<script>
     const apiKey1 = 'n8n_api_f37ee7afcc40c05010cb4a3c595864bebf6018d316d5cdcdb06c8169fb59f9ef341d27727b0f9b5d';
     const apiKey2 = 'n8n_api_f37ee7afcc40c05010cb4a3c595864bebf6018d316d5cdcdb06c8169fb59f9ef341d27727b0f9b5d';
     const webhookUrl1 = 'http://localhost:5678/webhook/47c193b6-988b-45af-b777-bff42ca01f3b';
@@ -836,90 +836,80 @@
     const svgServiceUrl = 'https://ws.arg.tech/t/json-svg';
 
     function toggleWorkflows() {
-      const isWorkflow1Selected = document.getElementById('workflow1Checkbox').checked;
-      const isWorkflow2Selected = document.getElementById('workflow2Checkbox').checked;
+        const isWorkflow1Selected = document.getElementById('workflow1Checkbox').checked;
+        const isWorkflow2Selected = document.getElementById('workflow2Checkbox').checked;
 
-      document.getElementById('workflow1').style.display = isWorkflow1Selected ? 'block' : 'none';
-      document.getElementById('workflow2').style.display = isWorkflow2Selected ? 'block' : 'none';
+        document.getElementById('workflow1').style.display = isWorkflow1Selected ? 'block' : 'none';
+        document.getElementById('workflow2').style.display = isWorkflow2Selected ? 'block' : 'none';
     }
 
     function sendToSvgService(jsonData) {
-      const formData = new FormData();
-      formData.append('data', new Blob([JSON.stringify(jsonData)], { type: 'application/json' }), 'input.json');
+        const formData = new FormData();
+        formData.append('data', new Blob([JSON.stringify(jsonData)], { type: 'application/json' }), 'input.json');
 
-      fetch(svgServiceUrl, {
-        method: 'POST',
-        body: formData,
-      })
-        .then(response => {
-          console.log('SVG Service Response:', response); // Log the response object
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          return response.arrayBuffer(); // Use arrayBuffer() for binary data
+        fetch(svgServiceUrl, {
+            method: 'POST',
+            body: formData,
         })
-        .then(responseBuffer => {
-          console.log('SVG Service Response ArrayBuffer:', responseBuffer); // Log the binary data
-          
-          // If it's an SVG (or binary data like a compressed image), handle it as needed.
-          // For example, convert binary to base64 for images or directly to SVG for SVG content:
-          
-          const array = new Uint8Array(responseBuffer);
-          const base64Data = btoa(String.fromCharCode(...array)); // Convert binary to base64
-
-          const svgContainer = document.getElementById('svgContainer');
-          
-          // If it's SVG, directly embed it, otherwise convert the base64 to an image:
-          const svgText = new TextDecoder().decode(array); // Try to decode the response to a text string (SVG)
-
-          // If decoding as SVG text works, display it:
-          if (svgText.startsWith('<svg')) {
-            svgContainer.innerHTML = svgText; // Display SVG directly
-          } else {
-            // Otherwise, create an image tag for the base64 data
-            svgContainer.innerHTML = `<img src="data:image/svg+xml;base64,${base64Data}" alt="SVG Image">`;
-          }
+        .then(response => {
+            console.log('SVG Service Response:', response); // Log the full response object
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.text(); // Parse as text (for HTML/SVG/etc.)
+        })
+        .then(responseText => {
+            console.log('SVG Service Response Body:', responseText); // Log the response body (HTML or SVG)
+            
+            // Check if the response is SVG content
+            const contentType = response.headers.get('Content-Type');
+            if (contentType && contentType.includes('image/svg+xml')) {
+                document.getElementById('svgContainer').innerHTML = responseText; // Display SVG in the div
+            } else {
+                console.error('Received non-SVG content:', responseText);
+                document.getElementById('svgContainer').innerHTML = `<span class="error">Error: Received non-SVG content. Content-Type: ${contentType}</span>`;
+            }
         })
         .catch(error => {
-          console.error('Error:', error);
-          document.getElementById('svgContainer').innerHTML = `<span class="error">Error: ${error.message}</span>`;
+            console.error('Error:', error);
+            document.getElementById('svgContainer').innerHTML = `<span class="error">Error: ${error.message}</span>`;
         });
     }
 
     document.getElementById('triggerWebhookButton').addEventListener('click', () => {
-      const userInput = document.getElementById('userInput').value.trim();
-      if (!userInput) {
-        alert("Please enter text before triggering the workflow.");
-        return;
-      }
+        const userInput = document.getElementById('userInput').value.trim();
+        if (!userInput) {
+            alert("Please enter text before triggering the workflow.");
+            return;
+        }
 
-      const selectedWorkflow = document.getElementById('workflow1Checkbox').checked ? webhookUrl1 : webhookUrl2;
-      const apiKey = selectedWorkflow === webhookUrl1 ? apiKey1 : apiKey2;
+        const selectedWorkflow = document.getElementById('workflow1Checkbox').checked ? webhookUrl1 : webhookUrl2;
+        const apiKey = selectedWorkflow === webhookUrl1 ? apiKey1 : apiKey2;
 
-      fetch(selectedWorkflow, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-N8N-API-KEY': apiKey,
-        },
-        body: JSON.stringify({ text: userInput }),
-      })
+        fetch(selectedWorkflow, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-N8N-API-KEY': apiKey,
+            },
+            body: JSON.stringify({ text: userInput }),
+        })
         .then(response => {
-          console.log('Webhook Response:', response); // Log the full webhook response object
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          return response.json(); // Parse response as JSON
+            console.log('Webhook Response:', response); // Log the full webhook response object
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json(); // Parse response as JSON
         })
         .then(data => {
-          console.log('Webhook Response Data:', data); // Log the parsed JSON data
-          document.getElementById('responseData').textContent = JSON.stringify(data, null, 2);
-          sendToSvgService(data); // Send JSON response to SVG service
+            console.log('Webhook Response Data:', data); // Log the parsed JSON data
+            document.getElementById('responseData').textContent = JSON.stringify(data, null, 2);
+            sendToSvgService(data); // Send JSON response to SVG service
         })
         .catch(error => {
-          console.error('Error:', error);
-          const responseDiv = document.getElementById('webhookResponse');
-          responseDiv.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+            console.error('Error:', error);
+            const responseDiv = document.getElementById('webhookResponse');
+            responseDiv.innerHTML = `<span class="error">Error: ${error.message}</span>`;
         });
     });
 
