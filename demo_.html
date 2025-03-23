@@ -852,12 +852,15 @@
         body: formData,
       })
         .then(response => {
+          console.log('SVG Service Response:', response); // Log full response object
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
-          return response.text(); // Response will be handled as text
+          return response.text(); // Parse as text (for HTML/SVG/etc.)
         })
         .then(responseText => {
+          console.log('SVG Service Response Body:', responseText); // Log the response body (HTML or SVG)
+          
           // Check if response is HTML (this will typically mean it's an error or non-SVG content)
           if (responseText.includes('<html>')) {
             console.error('Received HTML response instead of SVG:', responseText);
@@ -892,12 +895,14 @@
         body: JSON.stringify({ text: userInput }),
       })
         .then(response => {
+          console.log('Webhook Response:', response); // Log the full webhook response object
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
-          return response.json();
+          return response.json(); // Parse response as JSON
         })
         .then(data => {
+          console.log('Webhook Response Data:', data); // Log the parsed JSON data
           document.getElementById('responseData').textContent = JSON.stringify(data, null, 2);
           sendToSvgService(data); // Send JSON response to SVG service
         })
