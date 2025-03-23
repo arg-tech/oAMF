@@ -819,7 +819,7 @@
   <div id="svgContainer" style="margin-top: 20px; text-align: center;">
     <h3>Argument Graph</h3>
   </div>
-  
+
   <div id="webhookResponse">
     <h3>xAIF Output</h3>
     <pre id="responseData"></pre>
@@ -829,10 +829,7 @@
 
 
   <script>
-
-
     const apiKey1 = 'n8n_api_f37ee7afcc40c05010cb4a3c595864bebf6018d316d5cdcdb06c8169fb59f9ef341d27727b0f9b5d';
-
     const apiKey2 = 'n8n_api_f37ee7afcc40c05010cb4a3c595864bebf6018d316d5cdcdb06c8169fb59f9ef341d27727b0f9b5d';
     const webhookUrl1 = 'http://localhost:5678/webhook/47c193b6-988b-45af-b777-bff42ca01f3b';
     const webhookUrl2 = 'http://localhost:5678/webhook/47c193b6-988b-45af-b777-bff42ca01f3b2';
@@ -858,10 +855,17 @@
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
-          return response.text(); // SVG response is text
+          return response.text(); // SVG response is expected as text
         })
-        .then(svgData => {
-          document.getElementById('svgContainer').innerHTML = svgData; // Display SVG in the div
+        .then(responseText => {
+          // Check if the response is HTML instead of SVG
+          if (responseText.includes('<html>')) {
+            console.error("Received HTML instead of SVG:", responseText);
+            document.getElementById('svgContainer').innerHTML = `<span class="error">Error: HTML response received instead of SVG. Please check the service.</span>`;
+          } else {
+            // If the response is SVG (or expected text data), insert it into the container
+            document.getElementById('svgContainer').innerHTML = responseText;
+          }
         })
         .catch(error => {
           console.error('Error:', error);
@@ -907,9 +911,8 @@
     document.getElementById('workflow1Checkbox').addEventListener('change', toggleWorkflows);
     document.getElementById('workflow2Checkbox').addEventListener('change', toggleWorkflows);
     toggleWorkflows();
+</script>
 
-
-  </script>
 
 </body>
 </html>
