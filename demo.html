@@ -835,7 +835,6 @@
     const webhookUrl2 = 'http://localhost:5678/webhook/47c193b6-988b-45af-b777-bff42ca01f3b2';
     const svgServiceUrl = 'https://svg.amfws.arg.tech';
 
-    const svgServiceUrl2 = 'https://corsproxy.io/?https://ws.arg.tech/t/json-svg'; // temprary fix of cross domain
 
 
 
@@ -852,7 +851,6 @@
         formData.append('data', new Blob([JSON.stringify(jsonData)], { type: 'application/json' }), 'input.json');
 
         fetch(svgServiceUrl, {
-            mode: 'no-cors', 
             method: 'POST',
             body: formData,
         })
