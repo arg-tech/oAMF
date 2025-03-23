@@ -858,8 +858,14 @@
           return response.text(); // Response will be handled as text
         })
         .then(responseText => {
-          // Directly insert the response as it is (without checks)
-          document.getElementById('svgContainer').innerHTML = responseText;
+          // Check if response is HTML (this will typically mean it's an error or non-SVG content)
+          if (responseText.includes('<html>')) {
+            console.error('Received HTML response instead of SVG:', responseText);
+            document.getElementById('svgContainer').innerHTML = `<span class="error">Error: Received HTML response instead of SVG.</span>`;
+          } else {
+            // If it's not HTML, display it (assume it's SVG or other expected content)
+            document.getElementById('svgContainer').innerHTML = responseText;
+          }
         })
         .catch(error => {
           console.error('Error:', error);
