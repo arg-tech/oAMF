@@ -722,20 +722,15 @@
     function sendToSvgService(jsonData) {
         console.log("Sending to SVG Service:", JSON.stringify(jsonData, null, 2));
 
-        // Fetch with timeout handling
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 seconds timeout
-
         fetch(svgServiceUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(jsonData),
-            signal: controller.signal
+            body: JSON.stringify(jsonData) // Sending raw JSON
         })
         .then(response => {
-            clearTimeout(timeoutId); // Clear timeout if the response comes before the timeout
+            console.log('SVG Service Response:', response);
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
@@ -753,7 +748,6 @@
             }
         })
         .catch(error => {
-            clearTimeout(timeoutId); // Clear timeout if the fetch operation fails
             console.error('Error:', error);
             document.getElementById('svgContainer').innerHTML = `<span class="error">Error: ${error.message}</span>`;
         });
@@ -799,7 +793,6 @@
     document.getElementById('workflow2Checkbox').addEventListener('change', toggleWorkflows);
     toggleWorkflows();
 </script>
-
 
 
 
