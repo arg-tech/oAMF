@@ -704,19 +704,12 @@
 
 
 
-<script>
+  <script>
     const apiKey1 = 'n8n_api_f37ee7afcc40c05010cb4a3c595864bebf6018d316d5cdcdb06c8169fb59f9ef341d27727b0f9b5d';
     const apiKey2 = 'n8n_api_f37ee7afcc40c05010cb4a3c595864bebf6018d316d5cdcdb06c8169fb59f9ef341d27727b0f9b5d';
     const webhookUrl1 = 'http://localhost:5678/webhook/47c193b6-988b-45af-b777-bff42ca01f3b';
     const webhookUrl2 = 'http://localhost:5678/webhook/47c193b6-988b-45af-b777-bff42ca01f3b2';
-    //const apiKey1 = 'n8n_api_33f654a16bd8eae73787a4566fbc201e701291f1ab3260bfb519483a46e5fc892ebeda865c8ce0f7';
-    //const apiKey2 = 'n8n_api_33f654a16bd8eae73787a4566fbc201e701291f1ab3260bfb519483a46e5fc892ebeda865c8ce0f7';
-    //const webhookUrl2 = 'https://n8n-new.arg.tech:5678/webhook/47c193b6-988b-45af-b777-bff42ca01f4c'
-    //const webhookUrl1 = 'https://n8n-new.arg.tech:5678/webhook/47c193b6-988b-45af-b777-bff42ca01f3c';
     const svgServiceUrl = 'https://svg.amfws.staging.arg.tech';
-
-
-
 
     function toggleWorkflows() {
         const isWorkflow1Selected = document.getElementById('workflow1Checkbox').checked;
@@ -727,27 +720,28 @@
     }
 
     function sendToSvgService(jsonData) {
-        const formData = new FormData();
-        formData.append('data', new Blob([JSON.stringify(jsonData)], { type: 'application/json' }), 'input.json');
+        console.log("Sending to SVG Service:", JSON.stringify(jsonData, null, 2));
 
         fetch(svgServiceUrl, {
             method: 'POST',
-            body: formData,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jsonData) // Sending raw JSON
         })
         .then(response => {
-            console.log('SVG Service Response:', response); // Log the full response object
+            console.log('SVG Service Response:', response);
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            return response.text(); // Parse as text (for HTML/SVG/etc.)
+            return response.text();
         })
         .then(responseText => {
-            console.log('SVG Service Response Body:', responseText); // Log the response body (HTML or SVG)
+            console.log('SVG Service Response Body:', responseText);
             
-            // Check if the response is SVG content
             const contentType = response.headers.get('Content-Type');
             if (contentType && contentType.includes('image/svg+xml')) {
-                document.getElementById('svgContainer').innerHTML = responseText; // Display SVG in the div
+                document.getElementById('svgContainer').innerHTML = responseText;
             } else {
                 console.error('Received non-SVG content:', responseText);
                 document.getElementById('svgContainer').innerHTML = `<span class="error">Error: Received non-SVG content. Content-Type: ${contentType}</span>`;
@@ -778,21 +772,20 @@
             body: JSON.stringify({ text: userInput }),
         })
         .then(response => {
-            console.log('Webhook Response:', response); // Log the full webhook response object
+            console.log('Webhook Response:', response);
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            return response.json(); // Parse response as JSON
+            return response.json();
         })
         .then(data => {
-            console.log('Webhook Response Data:', data); // Log the parsed JSON data
+            console.log('Webhook Response Data:', data);
             document.getElementById('responseData').textContent = JSON.stringify(data, null, 2);
             sendToSvgService(data); // Send JSON response to SVG service
         })
         .catch(error => {
             console.error('Error:', error);
-            const responseDiv = document.getElementById('webhookResponse');
-            responseDiv.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+            document.getElementById('webhookResponse').innerHTML = `<span class="error">Error: ${error.message}</span>`;
         });
     });
 
@@ -800,6 +793,7 @@
     document.getElementById('workflow2Checkbox').addEventListener('change', toggleWorkflows);
     toggleWorkflows();
 </script>
+
 
 
 
