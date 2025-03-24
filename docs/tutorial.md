@@ -95,7 +95,7 @@ More examples provided in Jupyter notebook: [https://github.com/arg-tech/oAMF/bl
 ---
 
 ### Drag-and-Drop Interface
-![n8n Drag-and-Drop Interface](assets/n8n.jpeg)
+![n8n Drag-and-Drop Interface](../assets/n8n.jpeg)
 oAMF integrates with **n8n**, an open-source workflow automation tool, to offer a drag-and-drop interface for building pipelines. Users can easily arrange modules and define their interactions visually.
 
 Once a pipeline is constructed in n8n, it can be executed directly within the interface or exported as a JSON file for execution via the API.
@@ -109,7 +109,8 @@ For more information on n8n, visit [n8n.io](https://n8n.arg.tech).
 ---
 
 ### Web Interface
-![Web Page](assets/site-design.png)
+![Web Page](../assets/site-design.png)
+
 The web interface allows users to execute pre-built pipelines on the oAMF server without needing to manually configure them. You can upload input data and run the pipeline directly from the web.
 
 
