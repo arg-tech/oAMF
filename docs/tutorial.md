@@ -1,4 +1,4 @@
-```markdown
+
 # Open Argument Mining Framework (oAMF) Documentation
 
 ## Table of Contents
