@@ -738,13 +738,13 @@
         })
         .then(responseText => {
             console.log('SVG Service Response Body:', responseText);
-
-            // Check if the response contains an SVG
-            if (responseText.includes('<svg')) {
+            
+            const contentType = response.headers.get('Content-Type');
+            if (contentType && contentType.includes('image/svg+xml')) {
                 document.getElementById('svgContainer').innerHTML = responseText;
             } else {
                 console.error('Received non-SVG content:', responseText);
-                document.getElementById('svgContainer').innerHTML = `<span class="error">Error: Invalid SVG content received</span>`;
+                document.getElementById('svgContainer').innerHTML = `<span class="error">Error: Received non-SVG content. Content-Type: ${contentType}</span>`;
             }
         })
         .catch(error => {
@@ -793,7 +793,6 @@
     document.getElementById('workflow2Checkbox').addEventListener('change', toggleWorkflows);
     toggleWorkflows();
 </script>
-
 
 
 
