@@ -5,7 +5,9 @@
 ![License](https://img.shields.io/badge/License-GPL%203.0-blue)
 
 
-oAMF is a **modular, open-source framework** designed for **end-to-end argument mining (AM)**. It empowers researchers and developers to construct, execute, and extend **customizable AM pipelines** using a variety of modules. The framework supports **multiple interfaces**, making it highly accessible to users with different technical backgrounds.
+
+oAMF is a modular **open-source framework** for **end-to-end argument mining (AM)**. It enables researchers and developers to build and run **customizable AM pipelines** using a diverse set of modules. With over 15 AM modules and oAMF-compatible extensions—including audio transcription, argument structure visualisation, and evaluation tools—the framework offers extensive functionality. Developers can integrate new AM modules or modify existing ones to fit their needs. Additionally, oAMF supports **multiple interfaces**, ensuring accessibility for users with varying technical expertise.  
+
 
 ## ✨ Key Features
 
@@ -53,19 +55,42 @@ This package allows you to locally deploy and execute AM pipelines with integrat
 
 ### 📂 Deploying and Loading Modules
 
-Modules can be loaded from **GitHub repositories** (for local execution) or **web services** (for remote execution). Below is an example of loading and deploying modules:
+Modules can be loaded from **GitHub repositories** (for local execution) or **web services** (for remote execution). See details of existing modules here [📚 Available Modules](#available-modules). Below is an example of loading and deploying modules:
 
 ```python
 from oamf import oAMF
 
 oamf = oAMF()
 
-# Modules to load: (URL, type ['repo' or 'ws'], deployment route, tag)
+
+
+""" Modules to Load  
+
+Specify the modules you want to load. You can do this in two ways:  
+
+1. **Using a deployed web service** – Provide the module’s web service URL.  
+2. **Deploying from a GitHub repository** – Provide the repository URL to deploy the module locally.  
+
+To achieve this, define the module’s URL, specify its type (`repo` for repositories or `ws` for web services), and assign a unique tag.  
+
+### Tags and Pipeline Construction  
+Tags are used later to construct a pipeline. If you need to use the same module multiple times within a pipeline, specify it multiple times with different tags.  
+
+
+Each module should be specified as:  
+
+
+(URL, type ['repo' or 'ws'], deployment route, tag)
+"""
 modules_to_load = [
     ("https://github.com/arg-tech/default_turninator.git", "repo", "turninator-01", "turninator"),
     ("https://github.com/arg-tech/default_segmenter.git", "repo", "segmenter-01", "segmenter"),
+    ("http://targer.amfws.arg.tech/targer-segmenter", "ws", "targer-segmenter", "targer"),
+    ("http://default-proposition-unitiser.amfws.arg.tech/propositionUnitizer-01", "ws", "propositionUnitizer-01", "propositionUnitizer"),
     ("http://bert-te.amfws.arg.tech/bert-te", "ws", "bert-te", "bert-te")
 ]
+
+
 
 # Load and deploy modules
 oamf.load_modules(modules_to_load)
@@ -73,22 +98,23 @@ oamf.load_modules(modules_to_load)
 
 ### 🔄 Creating and Running an AM Pipeline
 
-An AM pipeline is defined as a directed graph where each module processes and passes data to the next module. Here's how you define and execute a pipeline:
+An AM pipeline is defined as a directed graph where each module processes and passes data to the next module. The pipeline is created using the tags specified during module loading. Here's how you define and execute a pipeline:
 
 ```python
 # Define the pipeline using module tags
 pipeline_graph = [
     ("turninator", "segmenter"),   # "turninator" outputs to "segmenter"
-    ("segmenter", "bert-te")      # "segmenter" outputs to "bert-te"
+    ("segmenter", "propositionUnitizer")      # "segmenter" outputs to "bert-te"
+    ("propositionUnitizer", "bert-te")      # "segmenter" outputs to "bert-te"
 ]
 
 # Execute the pipeline using the defined workflow and an input file in xAIF format
-oamf.pipelineExecutor(pipeline_graph, input_file)
+output_path, xaif_result = oamf.pipelineExecutor(pipeline_graph, "example_input_file.json") # It writes the output to a temp file and also returns the xaif output
 ```
 
 ### 🖱️ Drag-and-Drop Interface
 
-Users can create AM pipelines visually in **n8n**, a workflow automation tool. In this interface, modules are represented as **nodes** that you can connect and execute. 
+Users can create AM pipelines visually in **n8n**, a workflow automation tool. In this interface, modules are represented as **nodes** that you can connect and execute. [Try it here](https://n8n-new.arg.tech/workflow/2)  
 
 
 ![n8n Drag-and-Drop Interface](assets/n8n.jpeg)
@@ -98,12 +124,12 @@ The workflow can also be exported as JSON and executed using the oAMF API. Examp
 
 ```python
 # Override the manually defined pipeline with one created using n8n (if applicable)
-oamf.pipelineExecutor(pipeline_graph, input_file, workflow_file)
+oamf.pipelineExecutor(pipeline_graph, "example_input_file.json", "workflow_file.json")
 ```
 
 ### 🌐 Web Interface
 
-The web interface allows users to upload **text/xAIF files**, select pipelines, and execute AM tasks without writing any code. Access the web interface here: [oAMF Web Interface](https://arg-tech.github.io/oAMF/).
+The web interface allows users to provide **Input Text**, select pipelines, and execute AM tasks without writing any code. Access the web interface here: [oAMF Web Interface](https://arg-tech.github.io/oAMF/).
 
 ![Web Page](assets/site-design.png)
 
@@ -111,7 +137,8 @@ The web interface allows users to upload **text/xAIF files**, select pipelines, 
 
 ## 📝 xAIF (Extended Argument Interchange Format)
 
-oAMF uses **xAIF** as a standard format for representing argument structures. Below is an example of xAIF in JSON format:
+oAMF uses **xAIF** as a standard format for representing argument structures. xAIF ensures interoperability between AM modules. 
+Check a quick xAIF Tutorial and the accompaning python library hereL  📖 **Tutorial**: [XAIF Tutorial](https://github.com/arg-tech/xaif/blob/main/docs/tutorial.md). Below is an example of xAIF in JSON format:
 
 ```json
 # Sample xAIF JSON 
@@ -248,7 +275,7 @@ aif= {
 }
 ```
 
-xAIF ensures interoperability between AM modules. oAMF includes the `xaif` library, which allows you to create, load, and manipulate xAIF data structures. Example usage:
+oAMF includes the `xaif` library, which allows you to create, load, and manipulate xAIF data structures. Example usage:
 
 ```python
 # Ensure you have the latest version of xaif (pip install xaif)
@@ -286,6 +313,12 @@ aif.add_component(component_type="argument_relation", relation_type="RA", iNode_
 print(aif.xaif)  # Print the generated xAIF data
 print(aif.get_csv("argument-relation"))  # Export to CSV format
 ```
+### 🔗 XAIF Library Resources  
+
+- 🛠️ **GitHub Repository**: [XAIF Library Repo](https://github.com/arg-tech/xaif)  
+- 📦 **PyPI Package**: [XAIF on PyPI](https://pypi.org/project/xaif/)  
+- 📖 **Tutorial**: [XAIF Tutorial](https://github.com/arg-tech/xaif/blob/main/docs/tutorial.md)  
+- 📓 **Jupyter Example**: [How to Use XAIF in Jupyter](https://github.com/arg-tech/xaif/blob/main/docs/xaif_example.ipynb)  
 
 ---
 
@@ -402,7 +435,7 @@ oAMF is licensed under the **Apache 2.0 License**, allowing free use, modificati
 
 - 📖 **Documentation & Tutorials**: [Read Docs](https://docs.arg.tech/oAMF) | [GitHub Docs](https://github.com/arg-tech/oAMF/blob/main/docs/tutorial.md) | [Jupyter Example](https://github.com/arg-tech/oAMF/blob/main/example/example_usage.ipynb)  
 - 🖥️ **Web Page**: [Try it here](https://arg-tech.github.io/oAMF/)  
-- 🖥️ **n8n Demo**: [Try it here](https://n8n.arg.tech/workflow/2)  
+- 🖥️ **n8n Demo**: [Try it here](https://n8n-new.arg.tech/workflow/2)  
 - 🛠️ **GitHub Source**: [oAMF GitHub](https://github.com/arg-tech/amf)  
 - 📦 **PyPI Package**: [oAMF on PyPI](https://pypi.org/project/oamf/)  
 ---
