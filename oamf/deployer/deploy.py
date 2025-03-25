@@ -22,6 +22,28 @@ class Deployer:
         repo_name = parsed_url.path.split("/")[-1].replace(".git", "")
         return repo_name
 
+
+    def get_service_and_container_name(self, project_path):
+        """Extract the service name and container name from docker-compose.yml."""
+        docker_compose_path = os.path.join(project_path, "docker-compose.yml")
+
+        # Read the docker-compose.yml file
+        with open(docker_compose_path, "r") as f:
+            compose_data = yaml.safe_load(f)
+        
+        services = compose_data.get('services', {})
+        
+        if not services:
+            raise ValueError("No services found in docker-compose.yml")
+        
+        service_name, service_details = next(iter(services.items()))  # Get the first (and only) service
+        container_name = service_details.get('container_name', service_name)  # Default to service name if container_name not set
+        
+        return service_name, container_name
+
+
+
+
     def _loadmodule(self, name, url, module_type, route, tag):
         """
         Dynamically load a module by specifying its name, repository URL, and type.
@@ -211,9 +233,15 @@ class Deployer:
         
         for url, module_type, route, tag in modules_to_load:
             module_name = self.get_repo_name_from_url(url)
+            if module_type == 'repo':
+                repo_path = os.path.join(self.modules_dir, module_name)
+                module_name, container_name = self.get_service_and_container_name(repo_path)
+                module_name = f'{module_name}{container_name}'
+            print("module_name --------------------------------------", module_name)
             #module_name = tag
             
             # Deploy the module only if it hasn't been deployed before
+            
             if tag not in deployed_modules:
                 deployed_modules[tag] = route  # Store deployed module with its assigned route
                 self._loadmodule(module_name, url, module_type, route,tag)

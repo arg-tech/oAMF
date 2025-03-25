@@ -217,10 +217,10 @@ class PipelineBuilder:
 
                 # Identify the modules providing input for this module
                 input_sources = [dep for dep in reverse_graph.get(module_name, []) if dep in module_outputs]
-                input_modules = [tag_to_module.get(dep, dep) for dep in input_sources]
+                #input_modules = [tag_to_module.get(dep, dep) for dep in input_sources]
 
                 # Print execution details
-                input_details = " and ".join(input_modules) if input_modules else "Original input"
+                #input_details = " and ".join(input_modules) if input_modules else "Original input"
                 print(f"Executing module '{module_name}' (tag: {module_tag})")
 
                 self.deployer.wait_for_service(module['url'])

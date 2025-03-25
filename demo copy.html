@@ -10,116 +10,83 @@
   <style>
     body {
       font-family: 'Arial', sans-serif;
-      background-color: #f1f1f1;
+      background-color: #f8f9fa;
       margin: 0;
-      padding: 0;
-      padding: 0;
-      box-sizing: border-box;
+      padding: 20px;
+      text-align: center;
     }
     h1 {
-      text-align: center;
       color: #333;
-      font-size: 2.5em;
-      margin-top: 50px;
     }
-    .workflow-selection {
+    .carousel-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .carousel {
+      display: flex;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      width: 300px;
+      gap: 10px;
+    }
+    .pipeline-card {
+      min-width: 200px;
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
       text-align: center;
-      margin: 30px 0;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
-    .workflow-selection label {
-      margin: 0 15px;
-      font-size: 1.2em;
-      color: #555;
-    }
-    .workflow-selection input {
-      margin-right: 10px;
-      accent-color: #0066cc;
+    .pipeline-card.active {
+      border: 2px solid #007bff;
     }
     .workflow-container {
       display: none;
-      margin-top: 30px;
-      background-color: #fff;
+      background: white;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-top: 20px;
     }
-    .workflow-container h2 {
-      text-align: center;
-      color: #444;
-      font-size: 1.8em;
-      margin-bottom: 20px;
+    .content-container {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
     }
-    #inputBoxContainer {
-      text-align: center;
-      margin-top: 30px;
-    }
-    #userInput {
-      padding: 10px;
-      font-size: 1.2em;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      width: 50%;
-      max-width: 400px;
-      outline: none;
-      transition: border 0.3s ease;
-    }
-    #userInput:focus {
-      border-color: #0066cc;
+    #svgContainer, #webhookResponse {
+      width: 45%;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     button {
-      background-color: #0066cc;
+      background: #007bff;
       color: white;
       border: none;
-      border-radius: 8px;
-      padding: 12px 30px;
-      font-size: 1.2em;
+      padding: 10px 20px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      border-radius: 5px;
     }
     button:hover {
-      background-color: #005bb5;
-    }
-    #webhookResponse {
-      margin-top: 30px;
-      padding: 20px;
-      background-color: #f9f9f9;
-      border-radius: 8px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-    #webhookResponse h3 {
-      margin-bottom: 10px;
-      color: #333;
-      font-size: 1.5em;
-    }
-    #responseData {
-      font-family: 'Courier New', monospace;
-      background-color: #e0e0e0;
-      padding: 15px;
-      border-radius: 8px;
-      overflow-x: auto;
-    }
-    n8n-demo {
-      --n8n-frame-background-color: #fafafa;
-      --n8n-json-background-color: #f0f0f0;
-      --n8n-copy-button-background-color: #ccc;
-      --n8n-workflow-min-height: 100px;
-      --n8n-iframe-border-radius: 15px;
+      background: #0056b3;
     }
   </style>
 </head>
 <body>
-
   <h1>Select and Execute Workflow</h1>
-
-  <div class="workflow-selection">
-    <label>
-      <input type="checkbox" id="workflow1Checkbox"> Workflow 1
-    </label>
-    <label>
-      <input type="checkbox" id="workflow2Checkbox"> Workflow 2
-    </label>
+  <div class="carousel-container">
+    <button onclick="scrollLeft()">⬅</button>
+    <div class="carousel" id="pipelineCarousel">
+      <div class="pipeline-card" onclick="selectPipeline(1)">Workflow 1</div>
+      <div class="pipeline-card" onclick="selectPipeline(2)">Workflow 2</div>
+    </div>
+    <button onclick="scrollRight()">➡</button>
   </div>
-
+  
   <div id="workflow1" class="workflow-container">
     <h2>Workflow 1</h2>
     <n8n-demo id="workflow1Visualization" workflow='{
@@ -401,7 +368,6 @@
       "tags": []
     }' frame="true"></n8n-demo>
   </div>
-
   <div id="workflow2" class="workflow-container">
     <h2>Workflow 2</h2>
     <n8n-demo id="workflow2Visualization" workflow='{
@@ -684,120 +650,38 @@
     }' frame="true"></n8n-demo>
   </div>
 
-  <div id="inputBoxContainer">
+  <div>
     <label for="userInput">Enter Text:</label>
-    <input type="text" id="userInput" value=" Bob: We should go eat. Wilma: Why?  Bob: Because I'm hungry Wilma: Yeah me too. Bob: So let's eat." placeholder=" Bob: We should go eat. Wilma: Why?  Bob: Because I'm hungry Wilma: Yeah me too. Bob: So let's eat." />
+    <input type="text" id="userInput" value="Sample input..." style="padding: 10px; width: 60%;">
   </div>
-
-  <div style="text-align: center; margin-top: 30px;">
-    <button id="triggerWebhookButton">Trigger Selected Workflow</button>
+  <button id="triggerWebhookButton">Trigger Workflow</button>
+  
+  <div class="content-container">
+    <div id="svgContainer">
+      <h3>Argument Graph</h3>
+    </div>
+    <div id="webhookResponse">
+      <h3>xAIF Output</h3>
+      <pre id="responseData"></pre>
+    </div>
   </div>
-
-  <div id="svgContainer" style="margin-top: 20px; text-align: center;">
-    <h3>Argument Graph</h3>
-  </div>
-
-  <div id="webhookResponse">
-    <h3>xAIF Output</h3>
-    <pre id="responseData"></pre>
-  </div>
-
-
-
-
+  
   <script>
-    const apiKey1 = 'n8n_api_f37ee7afcc40c05010cb4a3c595864bebf6018d316d5cdcdb06c8169fb59f9ef341d27727b0f9b5d';
-    const apiKey2 = 'n8n_api_f37ee7afcc40c05010cb4a3c595864bebf6018d316d5cdcdb06c8169fb59f9ef341d27727b0f9b5d';
-    const webhookUrl1 = 'http://localhost:5678/webhook/47c193b6-988b-45af-b777-bff42ca01f3b';
-    const webhookUrl2 = 'http://localhost:5678/webhook/47c193b6-988b-45af-b777-bff42ca01f3b2';
-    const svgServiceUrl = 'http://svg.amfws.arg.tech'; 
-
-    function toggleWorkflows() {
-        const isWorkflow1Selected = document.getElementById('workflow1Checkbox').checked;
-        const isWorkflow2Selected = document.getElementById('workflow2Checkbox').checked;
-
-        document.getElementById('workflow1').style.display = isWorkflow1Selected ? 'block' : 'none';
-        document.getElementById('workflow2').style.display = isWorkflow2Selected ? 'block' : 'none';
+    function scrollLeft() {
+      document.getElementById('pipelineCarousel').scrollBy({ left: -200, behavior: 'smooth' });
     }
-
-    function sendToSvgService(jsonData) {
-        console.log("Sending to SVG Service:", JSON.stringify(jsonData, null, 2));
-
-        fetch(svgServiceUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(jsonData) // Sending raw JSON
-        })
-        .then(response => {
-            console.log('SVG Service Response:', response);
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.text();
-        })
-        .then(responseText => {
-            console.log('SVG Service Response Body:', responseText);
-
-            // Check if the response contains an SVG
-            if (responseText.includes('<svg')) {
-                document.getElementById('svgContainer').innerHTML = responseText;
-            } else {
-                console.error('Received non-SVG content:', responseText);
-                document.getElementById('svgContainer').innerHTML = `<span class="error">Error: Invalid SVG content received</span>`;
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            document.getElementById('svgContainer').innerHTML = `<span class="error">Error: ${error.message}</span>`;
-        });
+    function scrollRight() {
+      document.getElementById('pipelineCarousel').scrollBy({ left: 200, behavior: 'smooth' });
     }
-
+    function selectPipeline(id) {
+      document.querySelectorAll('.pipeline-card').forEach(card => card.classList.remove('active'));
+      document.querySelectorAll('.workflow-container').forEach(container => container.style.display = 'none');
+      document.querySelector(`.pipeline-card:nth-child(${id})`).classList.add('active');
+      document.getElementById(`workflow${id}`).style.display = 'block';
+    }
     document.getElementById('triggerWebhookButton').addEventListener('click', () => {
-        const userInput = document.getElementById('userInput').value.trim();
-        if (!userInput) {
-            alert("Please enter text before triggering the workflow.");
-            return;
-        }
-
-        const selectedWorkflow = document.getElementById('workflow1Checkbox').checked ? webhookUrl1 : webhookUrl2;
-        const apiKey = selectedWorkflow === webhookUrl1 ? apiKey1 : apiKey2;
-
-        fetch(selectedWorkflow, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-N8N-API-KEY': apiKey,
-            },
-            body: JSON.stringify({ text: userInput }),
-        })
-        .then(response => {
-            console.log('Webhook Response:', response);
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Webhook Response Data:', data);
-            document.getElementById('responseData').textContent = JSON.stringify(data, null, 2);
-            sendToSvgService(data); // Send JSON response to SVG service
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            document.getElementById('webhookResponse').innerHTML = `<span class="error">Error: ${error.message}</span>`;
-        });
+      alert("Triggering selected workflow...");
     });
-
-    document.getElementById('workflow1Checkbox').addEventListener('change', toggleWorkflows);
-    document.getElementById('workflow2Checkbox').addEventListener('change', toggleWorkflows);
-    toggleWorkflows();
-</script>
-
-
-
-
-
+  </script>
 </body>
 </html>

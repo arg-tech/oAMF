@@ -19,21 +19,23 @@ oAMF is a **modular, open-source framework** designed for **end-to-end argument 
 
 ---
 
-## 📖 Table of Contents
 
-1. [Installation](#installation)
-2. [Usage](#usage)
-   - [Deploying and Loading Modules](#deploying-and-loading-modules)
-   - [Creating and Running an AM Pipeline](#creating-and-running-an-am-pipeline)
-   - [Drag-and-Drop Interface](#drag-and-drop-interface)
-   - [Web Interface](#web-interface)
-3. [📝 xAIF (Extended Argument Interchange Format)](#xaif-extended-argument-interchange-format)
-4. [📚 Available Modules](#available-modules)
-5. [📦 Module Development](#module-development)
-7. [📜 License](#license)
-8. [📚 Resources](#resources)
+## 📖 Table of Contents  
 
----
+1. [Installation](#installation)  
+2. [Usage](#usage)  
+   - [Deploying and Loading Modules](#deploying-and-loading-modules)  
+   - [Creating and Running an AM Pipeline](#creating-and-running-an-am-pipeline)  
+   - [Drag-and-Drop Interface](#drag-and-drop-interface)  
+   - [Web Interface](#web-interface)  
+3. [📝 xAIF (Extended Argument Interchange Format)](#xaif-extended-argument-interchange-format)  
+4. [📚 Available Modules](#available-modules)  
+5. [📦 Module Development](#module-development)  
+7. [📜 License](#license)  
+8. [📚 Resources](#resources)  
+9. 📖 **Documentation & Tutorials**  
+   - [GitHub Docs](https://github.com/arg-tech/oAMF/blob/main/docs/tutorial.md)  
+   - [Jupyter Example](https://github.com/arg-tech/oAMF/blob/main/example/example_usage.ipynb)  
 
 ## 🛠️ Installation
 
@@ -394,14 +396,15 @@ oAMF is licensed under the **Apache 2.0 License**, allowing free use, modificati
 
 ---
 
-## 📚 Resources
 
-- 📖 **Documentation & Tutorials**: [Read Docs](https://docs.arg.tech/oAMF)
-- 🖥️ **Web Page**: [Try it here](https://arg-tech.github.io/oAMF/)
-- 🖥️ **n8n Demo**: [Try it here](https://n8n.arg.tech/workflow/2)
-- 🛠️ **GitHub Source**: [oAMF GitHub](https://github.com/arg-tech/amf)
-- 📦 **PyPI Package**: [oAMF on PyPI](https://pypi.org/project/oamf/)
 
+## 📚 Resources  
+
+- 📖 **Documentation & Tutorials**: [Read Docs](https://docs.arg.tech/oAMF) | [GitHub Docs](https://github.com/arg-tech/oAMF/blob/main/docs/tutorial.md) | [Jupyter Example](https://github.com/arg-tech/oAMF/blob/main/example/example_usage.ipynb)  
+- 🖥️ **Web Page**: [Try it here](https://arg-tech.github.io/oAMF/)  
+- 🖥️ **n8n Demo**: [Try it here](https://n8n.arg.tech/workflow/2)  
+- 🛠️ **GitHub Source**: [oAMF GitHub](https://github.com/arg-tech/amf)  
+- 📦 **PyPI Package**: [oAMF on PyPI](https://pypi.org/project/oamf/)  
 ---
 
 ### 🚀 Happy Argument Mining with oAMF!
