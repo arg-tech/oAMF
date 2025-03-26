@@ -111,7 +111,12 @@ Once a pipeline is constructed in n8n, it can be executed directly within the in
 For more information on n8n, visit [n8n.io](https://n8n.arg.tech).
 
 
+The workflow can also be exported as JSON and executed using the oAMF API. Example:
 
+```python
+# Override the manually defined pipeline with one created using n8n (if applicable)
+oamf.pipelineExecutor(pipeline_graph, "example_input_file.json", "workflow_file.json")
+```
 
 
 ---
