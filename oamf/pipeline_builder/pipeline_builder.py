@@ -91,6 +91,7 @@ class PipelineBuilder:
             repo_name = module['repo_name']  # Unique repo name
             destination = os.path.join(self.deployer.modules_dir, repo_name)
 
+
             print(f"Processing module with tag '{tag}' -> Repo: '{repo_name}'")
 
             try:
@@ -114,7 +115,11 @@ class PipelineBuilder:
                         deployed_repos.add(repo_name)
 
                     # Get the service port from the compose file
-                    port = self.deployer.get_service_port_from_compose(destination, service_name=repo_name)
+                    
+                    service_name, cobtainer_name = self.deployer.get_service_and_container_name(destination)
+                    print("service_name'''''''''''''''''''''''''''''''''''''''''''''''''''''''''", service_name)
+                    port = self.deployer.get_service_port_from_compose(destination, service_name=service_name)
+                    print("port'''''''''''''''''''''''''''''''''''''''''''''''''''''''''", port)
                     execution_pipeline[tag] = {
                         "name": tag,  # Keep using the tag in the pipeline
                         "url": f"http://localhost:{port}/{route}",

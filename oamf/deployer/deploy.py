@@ -232,14 +232,15 @@ class Deployer:
         deployed_modules = {}
         
         for url, module_type, route, tag in modules_to_load:
-            module_name = self.get_repo_name_from_url(url)
+            module_name = f'{self.get_repo_name_from_url(url)}'
+            '''
             if module_type == 'repo':
                 repo_path = os.path.join(self.modules_dir, module_name)
                 module_name, container_name = self.get_service_and_container_name(repo_path)
                 module_name = f'{module_name}{container_name}'
             print("module_name --------------------------------------", module_name)
             #module_name = tag
-            
+            '''
             # Deploy the module only if it hasn't been deployed before
             
             if tag not in deployed_modules:

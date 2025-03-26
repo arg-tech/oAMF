@@ -56,8 +56,12 @@ from oamf import oAMF
 oamf = oAMF()  # Initialize the library
 
 # Modules to load: URL, type (repo or ws), route, and tag
+
 modules_to_load = [
     ("https://github.com/arg-tech/default_turninator.git", "repo", "turninator-01", "turninator"),
+    ("https://github.com/arg-tech/default_segmenter.git", "repo", "segmenter-01", "segmenter"),
+    ("http://targer.amfws.arg.tech/targer-segmenter", "ws", "targer-segmenter", "targer"),
+    ("http://default-proposition-unitiser.amfws.arg.tech/propositionUnitizer-01", "ws", "propositionUnitizer-01", "propositionUnitizer"),
     ("http://bert-te.amfws.arg.tech/bert-te", "ws", "bert-te", "bert-te")
 ]
 oamf.load_modules(modules_to_load)  # Load and deploy the modules
@@ -82,11 +86,15 @@ from oamf import oAMF
 oamf = oAMF()  # Initialize the library
 
 # Define pipeline as a graph
+# Define the pipeline using module tags
 pipeline_graph = [
-        ("turninator", "segmenter"),
-        ("segmenter", "bert-te")
+    ("turninator", "segmenter"),   # "turninator" outputs to "segmenter"
+    ("segmenter", "propositionUnitizer")      # "segmenter" outputs to "bert-te"
+    ("propositionUnitizer", "bert-te")      # "segmenter" outputs to "bert-te"
 ]
-oamf.pipelineExecutor(pipeline_graph, "input_file.json")
+
+# Execute the pipeline using the defined workflow and an input file in xAIF format
+output_path, xaif_result = oamf.pipelineExecutor(pipeline_graph, "example_input_file.json") # It writes the output to a temp file and also returns the xaif output
 ```
 
 More examples provided in Jupyter notebook: [https://github.com/arg-tech/oAMF/blob/main/example/example_usage.ipynb](https://github.com/arg-tech/oAMF/blob/main/example/example_usage.ipynb)
