@@ -11,7 +11,7 @@ oAMF is a modular **open-source framework** for **end-to-end argument mining (AM
 
 ## ✨ Key Features
 
-- **🔗 15+ Open-Source AM Modules**: Covering a broad range of argument mining tasks.
+- **🔗 17+ Open-Source AM Modules**: Covering a broad range of argument mining tasks.
 - **🖥️ Multiple Interfaces**:
   - **Web Interface**: Execute predefined pipelines directly from your browser.
   - **Drag-and-Drop Interface**: Create pipelines visually with **n8n**.
@@ -38,6 +38,8 @@ oAMF is a modular **open-source framework** for **end-to-end argument mining (AM
 9. 📖 **Documentation & Tutorials**  
    - [GitHub Docs](https://github.com/arg-tech/oAMF/blob/main/docs/tutorial.md)  
    - [Jupyter Example](https://github.com/arg-tech/oAMF/blob/main/example/example_usage.ipynb)  
+   - [A Python script for local deployment](https://github.com/arg-tech/oAMF/blob/main/example/install_and_run_componenets.py)
+
 
 ## 🛠️ Installation
 
@@ -104,8 +106,8 @@ An AM pipeline is defined as a directed graph where each module processes and pa
 # Define the pipeline using module tags
 pipeline_graph = [
     ("turninator", "segmenter"),   # "turninator" outputs to "segmenter"
-    ("segmenter", "propositionUnitizer")      # "segmenter" outputs to "bert-te"
-    ("propositionUnitizer", "bert-te")      # "segmenter" outputs to "bert-te"
+    ("segmenter", "propositionUnitizer")      # "segmenter" outputs to "propositionUnitizer"
+    ("propositionUnitizer", "bert-te")      # "propositionUnitizer" outputs to "bert-te"
 ]
 
 # Execute the pipeline using the defined workflow and an input file in xAIF format
@@ -114,7 +116,7 @@ output_path, xaif_result = oamf.pipelineExecutor(pipeline_graph, "example_input_
 
 ### 🖱️ Drag-and-Drop Interface
 
-Users can create AM pipelines visually in **n8n**, a workflow automation tool. In this interface, modules are represented as **nodes** that you can connect and execute. [Try it here](https://n8n-new.arg.tech/workflow/2)  
+Users can create AM pipelines visually in **n8n**, a workflow automation tool. In this interface, modules are represented as **nodes** that you can connect and execute. [Try it here](https://n8n.oamf.arg.tech/)  
 
 
 ![n8n Drag-and-Drop Interface](assets/n8n.jpeg)
@@ -124,7 +126,7 @@ The workflow can also be exported as JSON and executed using the oAMF API. Examp
 
 ```python
 # Override the manually defined pipeline with one created using n8n (if applicable)
-oamf.pipelineExecutor(pipeline_graph, "example_input_file.json", "workflow_file.json")
+output_path, xaif_result =  oamf.pipelineExecutor(pipeline_graph, "example_input_file.json", "workflow_file.json")
 ```
 
 ### 🌐 Web Interface
@@ -137,8 +139,12 @@ The web interface allows users to provide **Input Text**, select pipelines, and 
 
 ## 📝 xAIF (Extended Argument Interchange Format)
 
-oAMF uses **xAIF** as a standard format for representing argument structures. xAIF ensures interoperability between AM modules. 
-Check a quick xAIF Tutorial and the accompaning python library hereL  📖 **Tutorial**: [XAIF Tutorial](https://github.com/arg-tech/xaif/blob/main/docs/tutorial.md). Below is an example of xAIF in JSON format:
+oAMF uses **xAIF** as the standard format for representing argument structures, ensuring interoperability between AM modules.  
+For a quick introduction to xAIF, check out the 📖 **[xAIF Tutorial](https://github.com/arg-tech/xaif/blob/main/docs/tutorial.md)**.  
+You can also find the accompanying Python library here: [xAIF Python Library](https://pypi.org/project/xaif/). Example and more resources are provided below.
+
+
+Below is an example of xAIF in JSON format:
 
 ```json
 # Sample xAIF JSON 
@@ -326,23 +332,31 @@ print(aif.get_csv("argument-relation"))  # Export to CSV format
 
 oAMF includes a variety of argument mining modules, each designed for different tasks:
 
-| **Module**       | **Task**                                      | **Input**                                            | **Output**                                                   | **URL**                                                    |
-|------------------|-----------------------------------------------|------------------------------------------------------|--------------------------------------------------------------|------------------------------------------------------------|
-| **DTSG**         | Text Segmentation                              | Unsegmented text and no structure.                   | Text segmented into turns (e.g., contiguous text from one speaker or NOOP in case of monologue). | [Link](http://default-turninator.amfws.arg.tech/turninator-01) |
-| **DSG**          | Text Segmentation & Structuring               | Unsegmented text or text segmented into turns.       | Text segmented using the <SPAN> tag into segments; structure containing L-nodes with IDs cross-referencing those in SPAN tags. | [Link](default-segmenter.amfws.arg.tech/segmenter-01) |
-| **DARJ**         | Co-reference Resolution                       | Segmented locutions.                                 | Resolve co-references (mostly speaker names) in locution nodes. | [Link](cascading-propositionUnitiser.amfws.arg.tech/anaphora-01) |
-| **SPG**          | Segmentation and Proposition Structuring      | Text segmented using the <SPAN> tag into segments; structure with L-nodes. | Text segmented using <SPAN> tag into segments; structure with L-nodes anchoring YA-nodes connected to I-nodes. | [Link](default-proposition-unitiser.amfws.arg.tech/propositionUnitizer-01) |
-| **CPJ**          | Cascading Proposition Structuring             | Text segmented using the <SPAN> tag into segments; structure with L-nodes. | Text segmented using <SPAN> tag into segments; structure with L-nodes anchoring YA-nodes connected to I-nodes. | [Link](cascading-propositionUnitiser.amfws.arg.tech/propositionaliser-cascading) |
-| **DAMG**         | Argument Graph Generation                     | Segmented text; structure with I-nodes.              | Segmented text; structure with I-nodes connected with RA and CA nodes. | [Link](http://dam.amfws.arg.tech/dam-03) |
-| **DTERG**        | Argument Component Classification             | Segmented text; structure with I-nodes.              | Segmented text; structure with I-nodes connected with RA nodes. | [Link](bert-te.amfws.arg.tech/bert-te) |
-| **PDSCZ**        | Scheme-Based Classification                   | Segmented text; structure with I-nodes connected with RA nodes. | Segmented text; structure with I-nodes connected with RA nodes specified by pragma-dialectical scheme type. | [Link](http://amfws-schemeclassifier.arg.tech/schemes_clsf) |
-| **SARIM**        | xAIF File Processing                          | xAIF file containing proposition nodes.              | xAIF file containing input and new nodes (RA, CA) with related relations between nodes. | [Link](http://amfws-rp.arg.tech/somaye) |
-| **ARIR**         | Argument Graph Completion                     | xAIF file containing segmented propositional nodes.  | xAIF file with complete propositional argument graph, including RA, CA, and MA nodes, along with new edges. | [Link](http://amfws-ari.arg.tech/) |
-| **DRIG**         | Argumentation Graph Generation                | xAIF file containing I-nodes.                         | Segmented text; structure with I-nodes connected with RA, MA, and CA nodes. | [Link](vanilla-am-caasr.amfws.arg.tech/caasra) |
-| **WSCR**         | Scheme Replacement in Argumentation           | xAIF file containing propositional nodes (I) and RA relations. | xAIF file where "Default Inference" relations are replaced by specific argumentation schemes (e.g., Argument From Analogy). | [Link](http://amf-schemes.amfws.arg.tech) |
-| **PTCR**         | Proposition Classification                    | xAIF file containing propositional nodes (I).         | xAIF file with the "propositionClassifier" key containing list of propositions (I) classified into Value, Policy, and Fact types. | [Link](http://amf-ptc.amfws.arg.tech) |
-| **CASS-Moslemnejad-2025** | Evaluation Metrics                | Two comprehensive xAIF files with all information nodes and text segments. | F1 Macro/Accuracy/CASS/Text Similarity/Kappa/U-Alpha. | [Link](https://github.com/arg-tech/AMF-Evaluation-Scores) |
-| **whisper-speech-to-text-2025** | Speech-to-Text Transformation   | Audio file.                                          | xAIF with the text field populated with transcription. | [Link](realtime-backend.amfws.arg.tech/transcribe_whisper-0) |
+
+| **Module** | **Input** | **Output** | **Web-Service URL** | **Repo URL** |
+|------------|-----------|------------|---------------------|--------------|
+| `DTSG` | Unsegmented text and no structure. | Text segmented into turns (i.e. contiguous text from one speaker in the case of dialogue; NOOP in the case of monologue). | [http://default-turninator.amfws.arg.tech/turninator-01](http://default-turninator.amfws.arg.tech/turninator-01) | [https://github.com/arg-tech/default_turninator](https://github.com/arg-tech/default_turninator) |
+| `DSG` | Unsegmented text; no structure. | Segmented text; structure containing L-nodes with IDs crossreferring to those in SPAN tags. | [http://default-segmenter.amfws.arg.tech/segmenter-01](http://default-segmenter.amfws.arg.tech/segmenter-01) | [https://github.com/arg-tech/default_segmenter](https://github.com/arg-tech/default_segmenter) |
+| `TARGER` | Unsegmented text; no structure. | Segmented text; structure containing L-nodes with IDs crossreferring to those in SPAN tags. | [http://targer.amfws.arg.tech/targer-segmenter](http://targer.amfws.arg.tech/targer-segmenter) | [https://github.com/arg-tech/targer](https://github.com/arg-tech/targer) |
+| `DSS` | Unsegmented text; no structure. | Segmented text; structure containing L-nodes with IDs crossreferring to those in SPAN tags. | [http://amf-llm.amfws.staging.arg.tech/segmenter](http://amf-llm.amfws.staging.arg.tech/segmenter) | [https://github.com/arg-tech/oamf_llm](https://github.com/arg-tech/oamf_llm) |
+| `DARJ` | Segmented locutions. | Resolve co-references in locution nodes. | [http://cascading-propositionUnitiser.amfws.arg.tech/anaphora-01](http://cascading-propositionUnitiser.amfws.arg.tech/anaphora-01) | [https://github.com/arg-tech/cascading_propositionaliser](https://github.com/arg-tech/cascading_propositionaliser) |
+| `SPG` | Segmented text; structure containing L-nodes. | Segmented text; structure containing L-nodes anchoring YA-nodes connected to I-nodes. | [http://default-proposition-unitiser.amfws.arg.tech/propositionUnitizer-01](http://default-proposition-unitiser.amfws.arg.tech/propositionUnitizer-01) | [https://github.com/arg-tech/proposition-unitizer](https://github.com/arg-tech/proposition-unitizer) |
+| `CPJ` | Segmented text; structure containing L-nodes. | Segmented text; structure containing L-nodes anchoring YA-nodes connected to I-nodes. | [http://cascading-propositionUnitiser.amfws.arg.tech/propositionaliser-cascading](http://cascading-propositionUnitiser.amfws.arg.tech/propositionaliser-cascading) | [https://github.com/arg-tech/cascading_propositionaliser](https://github.com/arg-tech/cascading_propositionaliser) |
+| `DAMG` | Segmented text; structure with I-nodes. | Segmented text; structure with I-nodes connected with RA and CA nodes. | [http://dam.amfws.arg.tech/dam-03](http://dam.amfws.arg.tech/dam-03) | [https://github.com/arg-tech/dam](https://github.com/arg-tech/dam) |
+| `DTERG` | Segmented text; structure with I-nodes. | Segmented text; structure with I-nodes connected with RA nodes. | [http://bert-te.amfws.arg.tech/bert-te](http://bert-te.amfws.arg.tech/bert-te) | [https://github.com/arg-tech/bert-te](https://github.com/arg-tech/bert-te) |
+| `PDSCZ` | Segmented text; structure with I-nodes connected with RA nodes. | Segmented text; structure with I-nodes connected with RA nodes specified by pragma-dialectical scheme type. | [http://amfws-schemeclassifier.arg.tech/schemes_clsf](http://amfws-schemeclassifier.arg.tech/schemes_clsf) | [https://github.com/arg-tech/AMF_Scheme_Classifier2](https://github.com/arg-tech/AMF_Scheme_Classifier2) |
+| `SARIM` | xAIF file containing the proposition nodes (information nodes) in argument. | xAIF file containing the input and new nodes (i.e., RA, CA) which are related relations between nodes, and edges information which are connected between I nodes throughout the relation nodes. | [http://amfws-rp.arg.tech/somaye](http://amfws-rp.arg.tech/somaye) | [https://github.com/arg-tech/AMF-RP](https://github.com/arg-tech/AMF-RP) |
+| `ARIR` | xAIF file containing propositional argumentative nodes. | xAIF file with the complete propositional argument graph covering three argumentative relations (RA, CA, or MA). | [http://amfws-ari.arg.tech/](http://amfws-ari.arg.tech/) | [https://github.com/arg-tech/AMF_ARI](https://github.com/arg-tech/AMF_ARI) |
+| `TARGER-AM` | xAIF file containing propositional argumentative nodes. | xAIF file with the complete propositional argument graph covering three argumentative relations (RA, CA, or MA). | [http://targer.amfws.arg.tech/targer-am](http://targer.amfws.arg.tech/targer-am) | [https://github.com/arg-tech/targer/](https://github.com/arg-tech/targer/) |
+| `DRIG` | xAIF file containing the I nodes. | Segmented text; structure with I-nodes connected with RA, MA, and CA nodes. | [http://vanilla-dialogpt-am.amfws.arg.tech/caasra](http://vanilla-dialogpt-am.amfws.arg.tech/caasra) | [https://github.com/arg-tech/dialogpt-am-vanila](https://github.com/arg-tech/dialogpt-am-vanila) |
+| `DSRM` | xAIF file containing the I nodes. | Segmented text; structure with I-nodes connected with RA, MA, and CA nodes. | [http://amf-llm.amfws.staging.arg.tech/relation_identifier](http://amf-llm.amfws.staging.arg.tech/relation_identifier) | [https://github.com/arg-tech/oamf_llm](https://github.com/arg-tech/oamf_llm) |
+| `WSCR` | xAIF file containing I nodes and the RA between them. | xAIF file where the "Default Inference" relations have been replaced by a specific argumentation scheme (e.g., "Argument From Analogy"). | [http://amf-schemes.amfws.arg.tech](http://amf-schemes.amfws.arg.tech) | [https://github.com/arg-tech/AMF_SchemeClassifier](https://github.com/arg-tech/AMF_SchemeClassifier) |
+| `PTCR` | xAIF file containing I nodes. | xAIF file with the "propositionClassifier" key containing the list of I nodes with one of the three types (i.e., Value, Policy, and Fact) assigned to them. | [http://amf-ptc.amfws.arg.tech](http://amf-ptc.amfws.arg.tech) | [https://github.com/arg-tech/AMF_PTC_VFP](https://github.com/arg-tech/AMF_PTC_VFP) |
+| `CASS` | Two xAIF files | F1 Macro/Accuracy/CASS/Text Similarity/Kappa/U-Alpha | [http://amf-evaluation-score.amfws.arg.tech](http://amf-evaluation-score.amfws.arg.tech) | [https://github.com/arg-tech/amf-evaluation-score](https://github.com/arg-tech/amf-evaluation-score) |
+| `WSTT` | Audio Input | xAIF with the text field populated with transcription | [http://realtime-backend.amfws.arg.tech/transcribe_whisper-0](http://realtime-backend.amfws.arg.tech/transcribe_whisper-0) | [https://github.com/arg-tech/realtime-backend](https://github.com/arg-tech/realtime-backend) |
+| `SV` | xAIF | SVG | [http://svg.amfws.arg.tech](http://svg.amfws.arg.tech) | [https://github.com/arg-tech/svg-visualiser](https://github.com/arg-tech/svg-visualiser) |
+
+
 
 
 
@@ -435,7 +449,7 @@ oAMF is licensed under the **Apache 2.0 License**, allowing free use, modificati
 
 - 📖 **Documentation & Tutorials**: [Read Docs](https://docs.arg.tech/oAMF) | [GitHub Docs](https://github.com/arg-tech/oAMF/blob/main/docs/tutorial.md) | [Jupyter Example](https://github.com/arg-tech/oAMF/blob/main/example/example_usage.ipynb)  
 - 🖥️ **Web Page**: [Try it here](https://arg-tech.github.io/oAMF/)  
-- 🖥️ **n8n Demo**: [Try it here](https://n8n-new.arg.tech/workflow/2)  
+- 🖥️ **n8n Demo**: [Try it here](https://n8n.oamf.arg.tech/)  
 - 🛠️ **GitHub Source**: [oAMF GitHub](https://github.com/arg-tech/amf)  
 - 📦 **PyPI Package**: [oAMF on PyPI](https://pypi.org/project/oamf/)  
 ---
@@ -443,4 +457,5 @@ oAMF is licensed under the **Apache 2.0 License**, allowing free use, modificati
 ### 🚀 Happy Argument Mining with oAMF!
 
 ---
+
 

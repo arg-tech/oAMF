@@ -25,5 +25,6 @@ class oAMF:
             # Process the pipeline
             executor = N8NPipelineExecutor(workflow_file, intput_file)
             if executor.graph and executor.http_nodes:
-                result = executor.execute_pipeline()                
-                return(f"Pipeline execution completed. Final result: {result}")
+                result_file_path, result_json = executor.execute_pipeline()                
+                #return(f"Pipeline execution completed. Final result: {result}")
+                return(f"Pipeline execution completed. Final result stored at: {result_file_path}", result_json)

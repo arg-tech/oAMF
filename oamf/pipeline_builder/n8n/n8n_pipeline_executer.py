@@ -65,6 +65,7 @@ class N8NPipelineExecutor:
         print("Dependencies:", self.get_dependency_tuples())
         
         pipeline_result = {}
+        pipeline_result_xaif = {}
         first_http_node = self.get_first_http_node()
         input_type = self.get_input_type(first_http_node) if first_http_node else "text"
         
@@ -85,7 +86,7 @@ class N8NPipelineExecutor:
             
             response = requests.request(method, url, files=input_data if input_type == "file" else json==input_data)
             print(f"Response from {node_name} (HTTP {method} {url}): {response.status_code}")
-            print(response.text)
+            #print(response.text)
             
             if response.status_code == 200:
                 response_data = response.json() if response.headers.get('Content-Type') == 'application/json' else response.text
@@ -93,9 +94,17 @@ class N8NPipelineExecutor:
             else:
                 input_data = response.text
             
-            pipeline_result[node_name] = input_data
+            #pipeline_result[node_name] = input_data
+            #pipeline_result_xaif[node_name] = response.text
+            pipeline_result[node_name] = (input_data, response.text)
+
+        #return pipeline_result.get(list(execution_graph.keys())[-1], input_file), module_outputs_json.get(list(execution_graph.keys())[-1], input_file)
         
-        return pipeline_result
+        #return pipeline_result
+        # Get the last executed node
+        last_node = execution_order[-1] if execution_order else None
+        path, xaif = pipeline_result.get(last_node, (None, None))
+        return path, xaif
 
 
     def extract_http_nodes_and_order(self, pipeline_data):
