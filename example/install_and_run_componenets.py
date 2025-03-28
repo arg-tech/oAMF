@@ -26,7 +26,7 @@ modules_to_load = [
     ("https://github.com/arg-tech/default_segmenter.git", "repo", "segmenter-01", "segmenter1"),
     ("https://github.com/arg-tech/default_segmenter.git", "repo", "segmenter-01", "segmenter2")
     
-]
+]   
 
 # Load and deploy the specified modules
 oamf.load_modules(modules_to_load)
@@ -40,8 +40,11 @@ pipeline_graph = [
 
 # Execute the pipeline using the defined workflow and input file in xAIF format
 
-output_path, result = oamf.pipelineExecutor(pipeline_graph, input_file)
+output_path, result = oamf.pipelineExecutor(pipeline_graph, input_file, workflow_file)
 
+print(result)
+
+"""
 # Override the manually defined pipeline with one built using n8n (if applicable)
 output_path, result  = oamf.pipelineExecutor(pipeline_graph, input_file, workflow_file)
 
@@ -49,7 +52,7 @@ output_path, result  = oamf.pipelineExecutor(pipeline_graph, input_file, workflo
 #oamf.export_n8n_workflow_to_python_script(workflow_file, input_file)
 print(output_path, result)
 
-"""Using free inout text"""
+# Using free inout text
 xaif_data = AIF("Scotland can be really cold at times. However Dundee is the suniest city in Scotland.") 
 
 # Write temporary JSON
@@ -69,3 +72,4 @@ output_path, output_json = oamf.pipelineExecutor(pipeline_graph, input_file_path
 
 print(output_path, output_json)
 
+"""
