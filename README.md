@@ -116,7 +116,7 @@ output_path, xaif_result = oamf.pipelineExecutor(pipeline_graph, "example_input_
 
 ### 🖱️ Drag-and-Drop Interface
 
-Users can create AM pipelines visually in **n8n**, a workflow automation tool. In this interface, modules are represented as **nodes** that you can connect and execute. [Try it here](https://n8n.oamf.arg.tech/)  
+Users can create AM pipelines visually in **n8n**, a workflow automation tool. In this interface, modules are represented as **nodes** that you can connect and execute. [Try it here](https://n8n.oamf.arg.tech/). Login with email: oamf-user@arg.tech; Password: Password1
 
 
 ![n8n Drag-and-Drop Interface](assets/n8n.jpeg)
@@ -131,7 +131,7 @@ output_path, xaif_result =  oamf.pipelineExecutor(pipeline_graph, "example_input
 
 ### 🌐 Web Interface
 
-The web interface allows users to provide **Input Text**, select pipelines, and execute AM tasks without writing any code. Access the web interface here: [oAMF Web Interface](https://arg-tech.github.io/oAMF/).
+The web interface allows users to provide **Input Text**, select pipelines, and execute AM tasks without writing any code. Access the web interface here: [oAMF Web Interface](https://oamf.arg.tech/).
 
 ![Web Page](assets/site-design.png)
 
